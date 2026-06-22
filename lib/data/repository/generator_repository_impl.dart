@@ -1,0 +1,32 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:barrel_generator/domain/entity/path.dart';
+import 'package:barrel_generator/domain/repository/generator_repository.dart';
+
+class GeneratorRepositoryImpl implements GeneratorRepository {
+  @override
+  Future<bool> exists(Path path) async {
+    return await File(path.path).exists();
+  }
+
+  @override
+  Future<Uint8List> read(FilePath path) async {
+    return await File(path.path).readAsBytes(); 
+  }
+  
+  @override
+  Future<void> appendToFile(FilePath path, Uint8List data) async {
+    await File(path.path).writeAsBytes(data, mode: .writeOnlyAppend);
+  }
+  
+  @override
+  Future<List<String>> readAsLines(FilePath path) async {
+    return await File(path.path).readAsLines();
+  }
+  
+  @override
+  Future<void> write(FilePath path, Uint8List data) async {
+    await File(path.path).writeAsBytes(data);
+  }
+}

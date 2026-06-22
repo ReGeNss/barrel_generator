@@ -1,7 +1,7 @@
 import 'package:args/args.dart';
 import 'package:barrel_generator/application/service/barrel_generator_service.dart';
 import 'package:barrel_generator/application/service/fs_watcher.dart';
-import 'package:barrel_generator/domain/generator_repository.dart';
+import 'package:barrel_generator/data/repository/generator_repository_impl.dart';
 
 const String version = '0.0.1';
 
@@ -14,8 +14,7 @@ ArgParser buildParser() {
       help: 'Print this usage information.',
     )
     ..addFlag('version', negatable: false, help: 'Print the tool version.')
-    ..addCommand('watch')
-    ;
+    ..addCommand('watch');
 }
 
 void printUsage(ArgParser argParser) {
@@ -38,9 +37,11 @@ void main(List<String> arguments) async {
       print('barrel_generator version: $version');
       return;
     }
-    
+
     if (results.command?.name == 'watch') {
-      await FsWatcher(generator: BarrelGeneratorService()).watch();
+      await FsWatcher(
+        generator: BarrelGeneratorService(repo: GeneratorRepositoryImpl()),
+      ).watch();
     }
   } on FormatException catch (e) {
     // Print usage information if an invalid argument was provided.
