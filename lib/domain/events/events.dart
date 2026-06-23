@@ -8,14 +8,19 @@ part 'events.freezed.dart';
 sealed class Event with _$Event {
   const factory Event.createdFile({required FilePath path}) = CreateFileEvent;
 
-  const factory Event.createdFolder({required FilePath path}) = CreateFolderEvent;
+  const factory Event.createdFolder({required FolderPath path}) = CreateFolderEvent;
 
   const factory Event.renamedFolder({
+    required FolderPath path,
+    required FolderPath oldLocation,
+  }) = RenamedFolderEvent;
+
+  const factory Event.renamedFile({
     required FilePath path,
     required FilePath oldLocation,
-  }) = RenamedFolderEvent;
+  }) = RenamedFileEvent;
 
   const factory Event.removedFile({required FilePath path}) = RemovedFileEvent;
 
-  const factory Event.removedFolder({required FilePath path}) = RemovedFolderEvent;
+  const factory Event.removedFolder({required FolderPath path}) = RemovedFolderEvent;
 }

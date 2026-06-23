@@ -43,8 +43,8 @@ class PathToIgnoreRepositoryImpl implements PathToIgnoreRepository {
 
   @override
   bool isIgnored(String path) {
-    if (!path.contains('$workingDirectory/') ||
-        !path.contains('$workingDirectory\\') ) {
+    if (!(path.contains('$workingDirectory/') ||
+        path.contains('$workingDirectory\\') )) {
       return true;
     }
 

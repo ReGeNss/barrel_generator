@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'package:args/args.dart';
 import 'package:barrel_generator/application/service/barrel_generator_service.dart';
-import 'package:barrel_generator/application/service/system_watcher.dart';
+import 'package:barrel_generator/application/service/watch_barrel_generator.dart';
+import 'package:barrel_generator/data/repository/system_watcher.dart';
 import 'package:barrel_generator/data/repository/generator_repository_impl.dart';
 import 'package:barrel_generator/data/repository/path_to_ignore_repository.dart';
 import 'package:barrel_generator/data/source/path_to_ignore_source.dart';
@@ -43,17 +43,16 @@ void main(List<String> arguments) async {
     }
 
     if (results.command?.name == 'watch') {
-      await SystemWatcher(
-        generator: BarrelGeneratorService(
-          repo: GeneratorRepositoryImpl(),
-          fileSeparator: Platform.isWindows ? '\\' : '/',
+      await WatchBarrelGeneratorService(
+        fsEvents: SystemWatcher(
+          ignoredPaths: PathToIgnoreRepositoryImpl(
+            workingDirectory: 'lib',
+            source: PathToIgnoreSource(),
+          )..getPathsToIgnore(),
         ),
-        ignoredPaths:
-            await PathToIgnoreRepositoryImpl(
-                workingDirectory: 'lib',
-                source: PathToIgnoreSource(),
-              )
-              ..getPathsToIgnore(),
+        g: BarrelGeneratorService(
+          repo: GeneratorRepositoryImpl(),
+        ),
       ).watch();
     }
   } on FormatException catch (e) {

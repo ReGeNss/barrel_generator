@@ -6,14 +6,17 @@ import "dart:io";
 import 'dart:collection';
 
 class BarrelGeneratorService {
-  BarrelGeneratorService({this.stopFolder = 'lib', required this.repo, required this.fileSeparator});
+  final GeneratorRepositoryImpl _repo;
+  final String _stopFolder;
+  final String _fileSeparator;
 
-  final GeneratorRepositoryImpl repo;
+  static final _newLine = Uint8List.fromList('\n'.codeUnits);
 
-  final String stopFolder;
-  final String fileSeparator;
-
-  static final newLine = Uint8List.fromList('\n'.codeUnits);
+  BarrelGeneratorService({
+    this._stopFolder = 'lib',
+    this._fileSeparator = '/',
+    required this._repo,
+  });
 
   Future<void> createForNewFile(FilePath path) async {
     final folder = path.fileFolder;
@@ -24,10 +27,10 @@ class BarrelGeneratorService {
     }
 
     try {
-      if (await repo.exists(folder)) {
+      if (await _repo.exists(folder)) {
         await _writeToBarrel(barrelFilePath, path);
       } else {
-        await repo.appendToFile(barrelFilePath, _exportFile(path));
+        await _repo.appendToFile(barrelFilePath, _exportFile(path));
       }
     } catch (e) {
       print(e.toString());
@@ -40,17 +43,17 @@ class BarrelGeneratorService {
     }
 
     await File(
-      "${path.path}$fileSeparator${path.nameWithType}",
-    ).writeAsBytes(_exportFile(path));
+      "${path.path}$_fileSeparator${path.nameWithType}",
+    ).create();
 
-    if (path.name == stopFolder) {
+    if (path.name == _stopFolder) {
       return;
     }
 
     final rootBarrelFile = _createBarrelFilePath(path.rootFolder);
 
-    if (!await repo.exists(rootBarrelFile)) {
-      await repo.appendToFile(rootBarrelFile, _exportFolder(path));
+    if (!await _repo.exists(rootBarrelFile)) {
+      await _repo.appendToFile(rootBarrelFile, _exportFolder(path));
     } else {
       await _writeToBarrel(rootBarrelFile, path);
     }
@@ -65,26 +68,30 @@ class BarrelGeneratorService {
   Future<void> _removeFromBarrel(Path path, FolderPath fileFolder) async {
     final rootBarrel = _createBarrelFilePath(fileFolder);
 
-    final lines = await repo.readAsLines(rootBarrel);
+    final lines = await _repo.readAsLines(rootBarrel);
 
     final formattedBarrel = lines.where(
       (line) => !line.contains(path.nameWithType),
     );
 
-    await repo.write(rootBarrel, Uint8List.fromList( formattedBarrel.join('\n').codeUnits));
+    await _repo.write(
+      rootBarrel,
+      Uint8List.fromList(formattedBarrel.join('\n').codeUnits),
+    );
   }
 
   Uint8List _exportFile(Path filePath) {
     return Uint8List.fromList([
       ..."export '${filePath.nameWithType}';".codeUnits,
-      ...newLine,
+      ..._newLine,
     ]);
   }
 
   Uint8List _exportFolder(Path filePath) {
     return Uint8List.fromList([
-      ...'export \'${filePath.name}$fileSeparator${filePath.nameWithType}\''.codeUnits,
-      ...newLine,
+      ...'export \'${filePath.name}$_fileSeparator${filePath.nameWithType}\';'
+          .codeUnits,
+      ..._newLine,
     ]);
   }
 
@@ -93,17 +100,17 @@ class BarrelGeneratorService {
   }
 
   Future<void> _writeToBarrel(FilePath barrelFilePath, Path path) async {
-    var fileData = await repo.read(barrelFilePath);
+    var fileData = await _repo.read(barrelFilePath);
 
-    final skipToEOF = fileData.length - newLine.length - 2;
+    final skipToEOF = fileData.length - _newLine.length - 2;
     if (skipToEOF > 0) {
       final hasEOF = fileData
           .skip(skipToEOF)
           .indexed
-          .every((pair) => newLine[pair.$1] == pair.$2);
+          .every((pair) => _newLine[pair.$1] == pair.$2);
 
       if (!hasEOF) {
-        fileData = Uint8List.fromList([...fileData, ...newLine]);
+        fileData = Uint8List.fromList([...fileData, ..._newLine]);
       }
     }
 
@@ -112,7 +119,7 @@ class BarrelGeneratorService {
     );
 
     try {
-      await repo.appendToFile(barrelFilePath, result);
+      await _repo.appendToFile(barrelFilePath, result);
     } catch (e) {
       throw ArgumentError('write error');
     }

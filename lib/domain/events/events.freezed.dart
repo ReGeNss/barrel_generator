@@ -14,12 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Event {
 
- FilePath get path;
-/// Create a copy of Event
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$EventCopyWith<Event> get copyWith => _$EventCopyWithImpl<Event>(this as Event, _$identity);
+ Path get path;
 
 
 
@@ -41,34 +36,8 @@ String toString() {
 }
 
 /// @nodoc
-abstract mixin class $EventCopyWith<$Res>  {
-  factory $EventCopyWith(Event value, $Res Function(Event) _then) = _$EventCopyWithImpl;
-@useResult
-$Res call({
- FilePath path
-});
-
-
-
-
-}
-/// @nodoc
-class _$EventCopyWithImpl<$Res>
-    implements $EventCopyWith<$Res> {
-  _$EventCopyWithImpl(this._self, this._then);
-
-  final Event _self;
-  final $Res Function(Event) _then;
-
-/// Create a copy of Event
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? path = null,}) {
-  return _then(_self.copyWith(
-path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
-as FilePath,
-  ));
-}
-
+class $EventCopyWith<$Res>  {
+$EventCopyWith(Event _, $Res Function(Event) __);
 }
 
 
@@ -86,13 +55,14 @@ extension EventPatterns on Event {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CreateFileEvent value)?  createdFile,TResult Function( CreateFolderEvent value)?  createdFolder,TResult Function( RenamedFolderEvent value)?  renamedFolder,TResult Function( RemovedFileEvent value)?  removedFile,TResult Function( RemovedFolderEvent value)?  removedFolder,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CreateFileEvent value)?  createdFile,TResult Function( CreateFolderEvent value)?  createdFolder,TResult Function( RenamedFolderEvent value)?  renamedFolder,TResult Function( RenamedFileEvent value)?  renamedFile,TResult Function( RemovedFileEvent value)?  removedFile,TResult Function( RemovedFolderEvent value)?  removedFolder,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case CreateFileEvent() when createdFile != null:
 return createdFile(_that);case CreateFolderEvent() when createdFolder != null:
 return createdFolder(_that);case RenamedFolderEvent() when renamedFolder != null:
-return renamedFolder(_that);case RemovedFileEvent() when removedFile != null:
+return renamedFolder(_that);case RenamedFileEvent() when renamedFile != null:
+return renamedFile(_that);case RemovedFileEvent() when removedFile != null:
 return removedFile(_that);case RemovedFolderEvent() when removedFolder != null:
 return removedFolder(_that);case _:
   return orElse();
@@ -112,13 +82,14 @@ return removedFolder(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CreateFileEvent value)  createdFile,required TResult Function( CreateFolderEvent value)  createdFolder,required TResult Function( RenamedFolderEvent value)  renamedFolder,required TResult Function( RemovedFileEvent value)  removedFile,required TResult Function( RemovedFolderEvent value)  removedFolder,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CreateFileEvent value)  createdFile,required TResult Function( CreateFolderEvent value)  createdFolder,required TResult Function( RenamedFolderEvent value)  renamedFolder,required TResult Function( RenamedFileEvent value)  renamedFile,required TResult Function( RemovedFileEvent value)  removedFile,required TResult Function( RemovedFolderEvent value)  removedFolder,}){
 final _that = this;
 switch (_that) {
 case CreateFileEvent():
 return createdFile(_that);case CreateFolderEvent():
 return createdFolder(_that);case RenamedFolderEvent():
-return renamedFolder(_that);case RemovedFileEvent():
+return renamedFolder(_that);case RenamedFileEvent():
+return renamedFile(_that);case RemovedFileEvent():
 return removedFile(_that);case RemovedFolderEvent():
 return removedFolder(_that);}
 }
@@ -134,13 +105,14 @@ return removedFolder(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CreateFileEvent value)?  createdFile,TResult? Function( CreateFolderEvent value)?  createdFolder,TResult? Function( RenamedFolderEvent value)?  renamedFolder,TResult? Function( RemovedFileEvent value)?  removedFile,TResult? Function( RemovedFolderEvent value)?  removedFolder,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CreateFileEvent value)?  createdFile,TResult? Function( CreateFolderEvent value)?  createdFolder,TResult? Function( RenamedFolderEvent value)?  renamedFolder,TResult? Function( RenamedFileEvent value)?  renamedFile,TResult? Function( RemovedFileEvent value)?  removedFile,TResult? Function( RemovedFolderEvent value)?  removedFolder,}){
 final _that = this;
 switch (_that) {
 case CreateFileEvent() when createdFile != null:
 return createdFile(_that);case CreateFolderEvent() when createdFolder != null:
 return createdFolder(_that);case RenamedFolderEvent() when renamedFolder != null:
-return renamedFolder(_that);case RemovedFileEvent() when removedFile != null:
+return renamedFolder(_that);case RenamedFileEvent() when renamedFile != null:
+return renamedFile(_that);case RemovedFileEvent() when removedFile != null:
 return removedFile(_that);case RemovedFolderEvent() when removedFolder != null:
 return removedFolder(_that);case _:
   return null;
@@ -159,12 +131,13 @@ return removedFolder(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( FilePath path)?  createdFile,TResult Function( FilePath path)?  createdFolder,TResult Function( FilePath path,  FilePath oldLocation)?  renamedFolder,TResult Function( FilePath path)?  removedFile,TResult Function( FilePath path)?  removedFolder,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( FilePath path)?  createdFile,TResult Function( FolderPath path)?  createdFolder,TResult Function( FolderPath path,  FolderPath oldLocation)?  renamedFolder,TResult Function( FilePath path,  FilePath oldLocation)?  renamedFile,TResult Function( FilePath path)?  removedFile,TResult Function( FolderPath path)?  removedFolder,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CreateFileEvent() when createdFile != null:
 return createdFile(_that.path);case CreateFolderEvent() when createdFolder != null:
 return createdFolder(_that.path);case RenamedFolderEvent() when renamedFolder != null:
-return renamedFolder(_that.path,_that.oldLocation);case RemovedFileEvent() when removedFile != null:
+return renamedFolder(_that.path,_that.oldLocation);case RenamedFileEvent() when renamedFile != null:
+return renamedFile(_that.path,_that.oldLocation);case RemovedFileEvent() when removedFile != null:
 return removedFile(_that.path);case RemovedFolderEvent() when removedFolder != null:
 return removedFolder(_that.path);case _:
   return orElse();
@@ -184,12 +157,13 @@ return removedFolder(_that.path);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( FilePath path)  createdFile,required TResult Function( FilePath path)  createdFolder,required TResult Function( FilePath path,  FilePath oldLocation)  renamedFolder,required TResult Function( FilePath path)  removedFile,required TResult Function( FilePath path)  removedFolder,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( FilePath path)  createdFile,required TResult Function( FolderPath path)  createdFolder,required TResult Function( FolderPath path,  FolderPath oldLocation)  renamedFolder,required TResult Function( FilePath path,  FilePath oldLocation)  renamedFile,required TResult Function( FilePath path)  removedFile,required TResult Function( FolderPath path)  removedFolder,}) {final _that = this;
 switch (_that) {
 case CreateFileEvent():
 return createdFile(_that.path);case CreateFolderEvent():
 return createdFolder(_that.path);case RenamedFolderEvent():
-return renamedFolder(_that.path,_that.oldLocation);case RemovedFileEvent():
+return renamedFolder(_that.path,_that.oldLocation);case RenamedFileEvent():
+return renamedFile(_that.path,_that.oldLocation);case RemovedFileEvent():
 return removedFile(_that.path);case RemovedFolderEvent():
 return removedFolder(_that.path);}
 }
@@ -205,12 +179,13 @@ return removedFolder(_that.path);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( FilePath path)?  createdFile,TResult? Function( FilePath path)?  createdFolder,TResult? Function( FilePath path,  FilePath oldLocation)?  renamedFolder,TResult? Function( FilePath path)?  removedFile,TResult? Function( FilePath path)?  removedFolder,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( FilePath path)?  createdFile,TResult? Function( FolderPath path)?  createdFolder,TResult? Function( FolderPath path,  FolderPath oldLocation)?  renamedFolder,TResult? Function( FilePath path,  FilePath oldLocation)?  renamedFile,TResult? Function( FilePath path)?  removedFile,TResult? Function( FolderPath path)?  removedFolder,}) {final _that = this;
 switch (_that) {
 case CreateFileEvent() when createdFile != null:
 return createdFile(_that.path);case CreateFolderEvent() when createdFolder != null:
 return createdFolder(_that.path);case RenamedFolderEvent() when renamedFolder != null:
-return renamedFolder(_that.path,_that.oldLocation);case RemovedFileEvent() when removedFile != null:
+return renamedFolder(_that.path,_that.oldLocation);case RenamedFileEvent() when renamedFile != null:
+return renamedFile(_that.path,_that.oldLocation);case RemovedFileEvent() when removedFile != null:
 return removedFile(_that.path);case RemovedFolderEvent() when removedFolder != null:
 return removedFolder(_that.path);case _:
   return null;
@@ -231,7 +206,7 @@ class CreateFileEvent implements Event {
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
+@JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $CreateFileEventCopyWith<CreateFileEvent> get copyWith => _$CreateFileEventCopyWithImpl<CreateFileEvent>(this, _$identity);
 
@@ -257,7 +232,7 @@ String toString() {
 /// @nodoc
 abstract mixin class $CreateFileEventCopyWith<$Res> implements $EventCopyWith<$Res> {
   factory $CreateFileEventCopyWith(CreateFileEvent value, $Res Function(CreateFileEvent) _then) = _$CreateFileEventCopyWithImpl;
-@override @useResult
+@useResult
 $Res call({
  FilePath path
 });
@@ -276,7 +251,7 @@ class _$CreateFileEventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? path = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? path = null,}) {
   return _then(CreateFileEvent(
 path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
 as FilePath,
@@ -293,11 +268,11 @@ class CreateFolderEvent implements Event {
   const CreateFolderEvent({required this.path});
   
 
-@override final  FilePath path;
+@override final  FolderPath path;
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
+@JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $CreateFolderEventCopyWith<CreateFolderEvent> get copyWith => _$CreateFolderEventCopyWithImpl<CreateFolderEvent>(this, _$identity);
 
@@ -323,9 +298,9 @@ String toString() {
 /// @nodoc
 abstract mixin class $CreateFolderEventCopyWith<$Res> implements $EventCopyWith<$Res> {
   factory $CreateFolderEventCopyWith(CreateFolderEvent value, $Res Function(CreateFolderEvent) _then) = _$CreateFolderEventCopyWithImpl;
-@override @useResult
+@useResult
 $Res call({
- FilePath path
+ FolderPath path
 });
 
 
@@ -342,10 +317,10 @@ class _$CreateFolderEventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? path = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? path = null,}) {
   return _then(CreateFolderEvent(
 path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
-as FilePath,
+as FolderPath,
   ));
 }
 
@@ -359,12 +334,12 @@ class RenamedFolderEvent implements Event {
   const RenamedFolderEvent({required this.path, required this.oldLocation});
   
 
-@override final  FilePath path;
- final  FilePath oldLocation;
+@override final  FolderPath path;
+ final  FolderPath oldLocation;
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
+@JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $RenamedFolderEventCopyWith<RenamedFolderEvent> get copyWith => _$RenamedFolderEventCopyWithImpl<RenamedFolderEvent>(this, _$identity);
 
@@ -390,9 +365,9 @@ String toString() {
 /// @nodoc
 abstract mixin class $RenamedFolderEventCopyWith<$Res> implements $EventCopyWith<$Res> {
   factory $RenamedFolderEventCopyWith(RenamedFolderEvent value, $Res Function(RenamedFolderEvent) _then) = _$RenamedFolderEventCopyWithImpl;
-@override @useResult
+@useResult
 $Res call({
- FilePath path, FilePath oldLocation
+ FolderPath path, FolderPath oldLocation
 });
 
 
@@ -409,8 +384,76 @@ class _$RenamedFolderEventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? path = null,Object? oldLocation = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? path = null,Object? oldLocation = null,}) {
   return _then(RenamedFolderEvent(
+path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
+as FolderPath,oldLocation: null == oldLocation ? _self.oldLocation : oldLocation // ignore: cast_nullable_to_non_nullable
+as FolderPath,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class RenamedFileEvent implements Event {
+  const RenamedFileEvent({required this.path, required this.oldLocation});
+  
+
+@override final  FilePath path;
+ final  FilePath oldLocation;
+
+/// Create a copy of Event
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$RenamedFileEventCopyWith<RenamedFileEvent> get copyWith => _$RenamedFileEventCopyWithImpl<RenamedFileEvent>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RenamedFileEvent&&(identical(other.path, path) || other.path == path)&&(identical(other.oldLocation, oldLocation) || other.oldLocation == oldLocation));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,path,oldLocation);
+
+@override
+String toString() {
+  return 'Event.renamedFile(path: $path, oldLocation: $oldLocation)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $RenamedFileEventCopyWith<$Res> implements $EventCopyWith<$Res> {
+  factory $RenamedFileEventCopyWith(RenamedFileEvent value, $Res Function(RenamedFileEvent) _then) = _$RenamedFileEventCopyWithImpl;
+@useResult
+$Res call({
+ FilePath path, FilePath oldLocation
+});
+
+
+
+
+}
+/// @nodoc
+class _$RenamedFileEventCopyWithImpl<$Res>
+    implements $RenamedFileEventCopyWith<$Res> {
+  _$RenamedFileEventCopyWithImpl(this._self, this._then);
+
+  final RenamedFileEvent _self;
+  final $Res Function(RenamedFileEvent) _then;
+
+/// Create a copy of Event
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? path = null,Object? oldLocation = null,}) {
+  return _then(RenamedFileEvent(
 path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
 as FilePath,oldLocation: null == oldLocation ? _self.oldLocation : oldLocation // ignore: cast_nullable_to_non_nullable
 as FilePath,
@@ -431,7 +474,7 @@ class RemovedFileEvent implements Event {
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
+@JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $RemovedFileEventCopyWith<RemovedFileEvent> get copyWith => _$RemovedFileEventCopyWithImpl<RemovedFileEvent>(this, _$identity);
 
@@ -457,7 +500,7 @@ String toString() {
 /// @nodoc
 abstract mixin class $RemovedFileEventCopyWith<$Res> implements $EventCopyWith<$Res> {
   factory $RemovedFileEventCopyWith(RemovedFileEvent value, $Res Function(RemovedFileEvent) _then) = _$RemovedFileEventCopyWithImpl;
-@override @useResult
+@useResult
 $Res call({
  FilePath path
 });
@@ -476,7 +519,7 @@ class _$RemovedFileEventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? path = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? path = null,}) {
   return _then(RemovedFileEvent(
 path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
 as FilePath,
@@ -493,11 +536,11 @@ class RemovedFolderEvent implements Event {
   const RemovedFolderEvent({required this.path});
   
 
-@override final  FilePath path;
+@override final  FolderPath path;
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
+@JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $RemovedFolderEventCopyWith<RemovedFolderEvent> get copyWith => _$RemovedFolderEventCopyWithImpl<RemovedFolderEvent>(this, _$identity);
 
@@ -523,9 +566,9 @@ String toString() {
 /// @nodoc
 abstract mixin class $RemovedFolderEventCopyWith<$Res> implements $EventCopyWith<$Res> {
   factory $RemovedFolderEventCopyWith(RemovedFolderEvent value, $Res Function(RemovedFolderEvent) _then) = _$RemovedFolderEventCopyWithImpl;
-@override @useResult
+@useResult
 $Res call({
- FilePath path
+ FolderPath path
 });
 
 
@@ -542,10 +585,10 @@ class _$RemovedFolderEventCopyWithImpl<$Res>
 
 /// Create a copy of Event
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? path = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? path = null,}) {
   return _then(RemovedFolderEvent(
 path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
-as FilePath,
+as FolderPath,
   ));
 }
 
