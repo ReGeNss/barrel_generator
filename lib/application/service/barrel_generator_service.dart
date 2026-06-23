@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:barrel_generator/data/repository/generator_repository_impl.dart';
@@ -9,7 +10,7 @@ class BarrelGeneratorService {
   final String _stopFolder;
   final String _fileSeparator;
 
-  static final _newLine = Uint8List.fromList('\n'.codeUnits);
+  static final _newLine = Uint8List.fromList('\n'.codeUnits).first;
 
   BarrelGeneratorService({
     this._stopFolder = 'lib',
@@ -18,7 +19,7 @@ class BarrelGeneratorService {
   });
 
   Future<void> createForFile(FilePath path) async {
-    final folder = path.parentFolder;
+    final folder = _requireParentFolder(path);
     final barrelFilePath = _createBarrelFilePath(folder);
 
     if (barrelFilePath.path == path.path) {
@@ -26,7 +27,7 @@ class BarrelGeneratorService {
     }
 
     try {
-      if (await _repo.exists(folder)) {
+      if (await _repo.exists(barrelFilePath)) {
         await _writeToBarrel(barrelFilePath, path);
       } else {
         await _repo.appendToFile(barrelFilePath, _exportFile(path));
@@ -49,7 +50,7 @@ class BarrelGeneratorService {
       return;
     }
 
-    final rootBarrelFile = _createBarrelFilePath(path.parentFolder);
+    final rootBarrelFile = _createBarrelFilePath(_requireParentFolder(path));
 
     if (!await _repo.exists(rootBarrelFile)) {
       await _repo.appendToFile(rootBarrelFile, _exportFolder(path));
@@ -59,10 +60,10 @@ class BarrelGeneratorService {
   }
 
   Future<void> fileDeleted(FilePath path) async =>
-      await _removeFromBarrel(path, path.parentFolder);
+      await _removeFromBarrel(path, _requireParentFolder(path));
 
   Future<void> folderDeleted(FolderPath path) async =>
-      await _removeFromBarrel(path, path.parentFolder);
+      await _removeFromBarrel(path, _requireParentFolder(path));
 
   Future<void> _removeFromBarrel(Path path, FolderPath fileFolder) async {
     final rootBarrel = _createBarrelFilePath(fileFolder);
@@ -82,45 +83,80 @@ class BarrelGeneratorService {
   Future<void> _writeToBarrel(FilePath barrelFilePath, Path path) async {
     var fileData = await _repo.read(barrelFilePath);
 
-    final skipToEOF = fileData.length - _newLine.length - 2;
+    late final bool hasEOF;
+    final skipToEOF = fileData.length - 2;
     if (skipToEOF > 0) {
-      final hasEOF = fileData
+      hasEOF = fileData
           .skip(skipToEOF)
           .indexed
-          .every((pair) => _newLine[pair.$1] == pair.$2);
+          .every((pair) => _newLine == pair.$2);
 
       if (!hasEOF) {
-        fileData = Uint8List.fromList([...fileData, ..._newLine]);
+        fileData = Uint8List.fromList([...fileData, _newLine]);
       }
     }
 
-    final result = Uint8List.fromList(
-      path is FolderPath ? _exportFolder(path) : _exportFile(path),
-    );
+    int countOfFilesInBarrel = fileData
+        .where((byte) => byte == _newLine)
+        .length;
+
+    if (hasEOF) {
+      countOfFilesInBarrel--;
+    }
+
+    final dirFiles = (await _repo.listFolderEntry(
+      barrelFilePath.parentFolder!,
+    )).where((path) => path.path != barrelFilePath.path);
+
+    if (dirFiles.length > countOfFilesInBarrel) {
+      final builder = BytesBuilder();
+      for (final path in dirFiles) {
+        builder.add(exportPath(path));
+      }
+
+      return _repo.write(barrelFilePath, builder.toBytes());
+    }
+
+    final newExport = Uint8List.fromList(exportPath(path));
 
     try {
-      await _repo.appendToFile(barrelFilePath, result);
+      await _repo.appendToFile(barrelFilePath, newExport);
     } catch (e) {
       throw ArgumentError('write error');
     }
   }
 
-    Uint8List _exportFile(Path filePath) {
+  Uint8List exportPath(Path path) {
+    if (path is FilePath) {
+      return _exportFile(path);
+    }
+    return _exportFolder(path as FolderPath);
+  }
+
+  Uint8List _exportFile(FilePath filePath) {
     return Uint8List.fromList([
       ..."export '${filePath.nameWithType}';".codeUnits,
-      ..._newLine,
+      _newLine,
     ]);
   }
 
-  Uint8List _exportFolder(Path filePath) {
+  Uint8List _exportFolder(FolderPath filePath) {
     return Uint8List.fromList([
       ...'export \'${filePath.name}$_fileSeparator${filePath.nameWithType}\';'
           .codeUnits,
-      ..._newLine,
+      _newLine,
     ]);
   }
 
   FilePath _createBarrelFilePath(FolderPath folder) {
     return FilePath(folder.path + r'\' + folder.nameWithType);
+  }
+
+  FolderPath _requireParentFolder(Path path) {
+    final folder = path.parentFolder;
+    if (folder == null) {
+      throw ArgumentError('Path "${path.path}" has no parent folder');
+    }
+    return folder;
   }
 }

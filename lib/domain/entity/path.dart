@@ -1,13 +1,18 @@
 abstract class Path {
   final String path;
-  final FolderPath parentFolder;
+  final FolderPath? parentFolder;
 
-  Path(this.path)
-    : parentFolder = FolderPath(
-        generateCrossPlatformRegExp(
-          r'[\w\W]*[\/\][\w\W]*(?![\w\.]*$)',
-        ).stringMatch(path)!,
-      );
+  Path(this.path) : parentFolder = _findParentFolder(path);
+
+  static FolderPath? _findParentFolder(String path) {
+    final folderPath = generateCrossPlatformRegExp(
+      r'[\w\W]*[\/\\][\w\W]*(?![\w\.]*$)',
+    ).stringMatch(path);
+
+    return folderPath != null && folderPath.isNotEmpty
+        ? FolderPath(folderPath)
+        : null;
+  }
 
   String get name => generateCrossPlatformRegExp(
     r'([^\/\\]+?)(?:\.[^.\/\\]+)?$',
@@ -25,7 +30,7 @@ class FilePath extends Path {
   //   return FolderPath(folderPath!); // TODO
   // }
 
-  String get folderName => parentFolder.name;
+  String? get folderName => parentFolder?.name;
 }
 
 class FolderPath extends Path {
