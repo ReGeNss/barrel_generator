@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:barrel_generator/data/repository/generator_repository_impl.dart';
 import 'package:barrel_generator/domain/entity/path.dart';
-import "dart:io";
 import 'dart:collection';
 
 class BarrelGeneratorService {
@@ -18,7 +17,7 @@ class BarrelGeneratorService {
     required this._repo,
   });
 
-  Future<void> createForNewFile(FilePath path) async {
+  Future<void> createForFile(FilePath path) async {
     final folder = path.fileFolder;
     final barrelFilePath = _createBarrelFilePath(folder);
 
@@ -37,14 +36,14 @@ class BarrelGeneratorService {
     }
   }
 
-  Future<void> createForNewFolder(FolderPath path) async {
-    if (!(await Directory(path.path).exists())) {
+  Future<void> createForFolder(FolderPath path) async {
+    if (!(await _repo.exists(path))) {
       throw ArgumentError('Folder did not exists');
     }
 
-    await File(
-      "${path.path}$_fileSeparator${path.nameWithType}",
-    ).create();
+    await _repo.create(
+      FilePath("${path.path}$_fileSeparator${path.nameWithType}"),
+    );
 
     if (path.name == _stopFolder) {
       return;
@@ -80,25 +79,6 @@ class BarrelGeneratorService {
     );
   }
 
-  Uint8List _exportFile(Path filePath) {
-    return Uint8List.fromList([
-      ..."export '${filePath.nameWithType}';".codeUnits,
-      ..._newLine,
-    ]);
-  }
-
-  Uint8List _exportFolder(Path filePath) {
-    return Uint8List.fromList([
-      ...'export \'${filePath.name}$_fileSeparator${filePath.nameWithType}\';'
-          .codeUnits,
-      ..._newLine,
-    ]);
-  }
-
-  FilePath _createBarrelFilePath(FolderPath folder) {
-    return FilePath(folder.path + r'\' + folder.nameWithType);
-  }
-
   Future<void> _writeToBarrel(FilePath barrelFilePath, Path path) async {
     var fileData = await _repo.read(barrelFilePath);
 
@@ -123,5 +103,24 @@ class BarrelGeneratorService {
     } catch (e) {
       throw ArgumentError('write error');
     }
+  }
+
+    Uint8List _exportFile(Path filePath) {
+    return Uint8List.fromList([
+      ..."export '${filePath.nameWithType}';".codeUnits,
+      ..._newLine,
+    ]);
+  }
+
+  Uint8List _exportFolder(Path filePath) {
+    return Uint8List.fromList([
+      ...'export \'${filePath.name}$_fileSeparator${filePath.nameWithType}\';'
+          .codeUnits,
+      ..._newLine,
+    ]);
+  }
+
+  FilePath _createBarrelFilePath(FolderPath folder) {
+    return FilePath(folder.path + r'\' + folder.nameWithType);
   }
 }

@@ -7,7 +7,10 @@ import 'package:barrel_generator/domain/repository/generator_repository.dart';
 class GeneratorRepositoryImpl implements GeneratorRepository {
   @override
   Future<bool> exists(Path path) async {
-    return await File(path.path).exists();
+    if (path is FilePath) {
+      return await File(path.path).exists();
+    }
+    return await Directory(path.path).exists();
   }
 
   @override
@@ -29,4 +32,11 @@ class GeneratorRepositoryImpl implements GeneratorRepository {
   Future<void> write(FilePath path, Uint8List data) async {
     await File(path.path).writeAsBytes(data);
   }
+  
+  @override
+  Future<void> create(FilePath path) async {
+    await File(path.path).create();
+  }
+
+  
 }

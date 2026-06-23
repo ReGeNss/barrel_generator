@@ -14,9 +14,9 @@ class WatchBarrelGeneratorService {
       final path = event.path;
       switch (event) {
         case CreateFileEvent():
-          return await _g.createForNewFile(path as FilePath);
+          return await _g.createForFile(path as FilePath);
         case CreateFolderEvent():
-          return await _g.createForNewFolder(path as FolderPath);
+          return await _g.createForFolder(path as FolderPath);
         case RenamedFolderEvent():
         case RemovedFileEvent():
         case RemovedFolderEvent():

@@ -12,4 +12,6 @@ abstract class GeneratorRepository {
   Future<List<String>> readAsLines(FilePath path);
 
   Future<void> write(FilePath path, Uint8List data);
+
+  Future<void> create(FilePath path); 
 }
