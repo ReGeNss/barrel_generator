@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:barrel_generator/data/repository/generator_repository_impl.dart';
@@ -26,15 +25,7 @@ class BarrelGeneratorService {
       return;
     }
 
-    try {
-      if (await _repo.exists(barrelFilePath)) {
-        await _writeToBarrel(barrelFilePath, path);
-      } else {
-        await _repo.appendToFile(barrelFilePath, _exportFile(path));
-      }
-    } catch (e) {
-      print(e.toString());
-    }
+    await _generateBarrelFor(barrelFilePath, path);
   }
 
   Future<void> createForFolder(FolderPath path) async {
@@ -52,10 +43,22 @@ class BarrelGeneratorService {
 
     final rootBarrelFile = _createBarrelFilePath(_requireParentFolder(path));
 
-    if (!await _repo.exists(rootBarrelFile)) {
-      await _repo.appendToFile(rootBarrelFile, _exportFolder(path));
-    } else {
-      await _writeToBarrel(rootBarrelFile, path);
+    await _generateBarrelFor(rootBarrelFile, path);
+  }
+
+  Future<void> _generateBarrelFor(FilePath barrelFile, Path file) async {
+    try {
+      if (await _repo.exists(barrelFile)) {
+        await _writeToBarrel(barrelFile, file);
+      } else {
+        final bytes = _getExportsFrom(
+          await _getDirPaths(barrelFile.parentFolder!, barrelFile),
+        );
+
+        await _repo.write(barrelFile, bytes);
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 
@@ -83,7 +86,7 @@ class BarrelGeneratorService {
   Future<void> _writeToBarrel(FilePath barrelFilePath, Path path) async {
     var fileData = await _repo.read(barrelFilePath);
 
-    late final bool hasEOF;
+    bool hasEOF = false;
     final skipToEOF = fileData.length - 2;
     if (skipToEOF > 0) {
       hasEOF = fileData
@@ -104,20 +107,16 @@ class BarrelGeneratorService {
       countOfFilesInBarrel--;
     }
 
-    final dirFiles = (await _repo.listFolderEntry(
+    final dirFiles = await _getDirPaths(
       barrelFilePath.parentFolder!,
-    )).where((path) => path.path != barrelFilePath.path);
+      barrelFilePath,
+    );
 
     if (dirFiles.length > countOfFilesInBarrel) {
-      final builder = BytesBuilder();
-      for (final path in dirFiles) {
-        builder.add(exportPath(path));
-      }
-
-      return _repo.write(barrelFilePath, builder.toBytes());
+      return _repo.write(barrelFilePath, _getExportsFrom(dirFiles));
     }
 
-    final newExport = Uint8List.fromList(exportPath(path));
+    final newExport = Uint8List.fromList(_exportPath(path));
 
     try {
       await _repo.appendToFile(barrelFilePath, newExport);
@@ -126,7 +125,21 @@ class BarrelGeneratorService {
     }
   }
 
-  Uint8List exportPath(Path path) {
+  Uint8List _getExportsFrom(Set<Path> dirFiles) {
+    final builder = BytesBuilder();
+    for (final path in dirFiles) {
+      builder.add(_exportPath(path));
+    }
+    return builder.toBytes();
+  }
+
+  Future<Set<Path>> _getDirPaths(FolderPath folder, FilePath barrelPath) async {
+    return (await _repo.listFolderEntry(
+      folder,
+    )).where((path) => path.path != barrelPath.path).toSet();
+  }
+
+  Uint8List _exportPath(Path path) {
     if (path is FilePath) {
       return _exportFile(path);
     }
