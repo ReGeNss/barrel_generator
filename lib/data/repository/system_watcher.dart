@@ -26,12 +26,10 @@ class SystemWatcher implements FsWatcher {
               }
             case FileSystemModifyEvent(:final path, :final isDirectory):
               return .renamedFile(path: FilePath(path), oldLocation: FilePath(path));
-              break;
             case FileSystemDeleteEvent(:final path):
               return Event.removedFile(path: FilePath(path));
             case FileSystemMoveEvent(:final path, :final isDirectory):
               return .renamedFile(path: FilePath(path), oldLocation: FilePath(path));
-              break;
           }
         });
   }

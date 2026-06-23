@@ -13,5 +13,7 @@ abstract class GeneratorRepository {
 
   Future<void> write(FilePath path, Uint8List data);
 
-  Future<void> create(FilePath path); 
+  Future<void> create(FilePath path);
+
+  Future<Set<Path>> listFolderEntry(FolderPath path);
 }

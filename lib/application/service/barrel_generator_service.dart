@@ -18,7 +18,7 @@ class BarrelGeneratorService {
   });
 
   Future<void> createForFile(FilePath path) async {
-    final folder = path.fileFolder;
+    final folder = path.parentFolder;
     final barrelFilePath = _createBarrelFilePath(folder);
 
     if (barrelFilePath.path == path.path) {
@@ -49,7 +49,7 @@ class BarrelGeneratorService {
       return;
     }
 
-    final rootBarrelFile = _createBarrelFilePath(path.rootFolder);
+    final rootBarrelFile = _createBarrelFilePath(path.parentFolder);
 
     if (!await _repo.exists(rootBarrelFile)) {
       await _repo.appendToFile(rootBarrelFile, _exportFolder(path));
@@ -59,10 +59,10 @@ class BarrelGeneratorService {
   }
 
   Future<void> fileDeleted(FilePath path) async =>
-      await _removeFromBarrel(path, path.fileFolder);
+      await _removeFromBarrel(path, path.parentFolder);
 
   Future<void> folderDeleted(FolderPath path) async =>
-      await _removeFromBarrel(path, path.rootFolder);
+      await _removeFromBarrel(path, path.parentFolder);
 
   Future<void> _removeFromBarrel(Path path, FolderPath fileFolder) async {
     final rootBarrel = _createBarrelFilePath(fileFolder);

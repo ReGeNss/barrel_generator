@@ -15,28 +15,35 @@ class GeneratorRepositoryImpl implements GeneratorRepository {
 
   @override
   Future<Uint8List> read(FilePath path) async {
-    return await File(path.path).readAsBytes(); 
+    return await File(path.path).readAsBytes();
   }
-  
+
   @override
   Future<void> appendToFile(FilePath path, Uint8List data) async {
     await File(path.path).writeAsBytes(data, mode: .writeOnlyAppend);
   }
-  
+
   @override
   Future<List<String>> readAsLines(FilePath path) async {
     return await File(path.path).readAsLines();
   }
-  
+
   @override
   Future<void> write(FilePath path, Uint8List data) async {
     await File(path.path).writeAsBytes(data);
   }
-  
+
   @override
   Future<void> create(FilePath path) async {
     await File(path.path).create();
   }
 
-  
+  @override
+  Future<Set<Path>> listFolderEntry(FolderPath path) async {
+    final entry = await Directory(path.path).list().toSet();
+
+    return entry
+        .map((e) => e is Directory ? FolderPath(e.path) : FilePath(e.path))
+        .toSet();
+  }
 }
