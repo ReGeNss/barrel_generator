@@ -6,11 +6,12 @@ import "dart:io";
 import 'dart:collection';
 
 class BarrelGeneratorService {
-  BarrelGeneratorService({this.stopFolder = 'lib', required this.repo});
+  BarrelGeneratorService({this.stopFolder = 'lib', required this.repo, required this.fileSeparator});
 
   final GeneratorRepositoryImpl repo;
 
   final String stopFolder;
+  final String fileSeparator;
 
   static final newLine = Uint8List.fromList('\n'.codeUnits);
 
@@ -39,7 +40,7 @@ class BarrelGeneratorService {
     }
 
     await File(
-      "${path.path}\\${path.nameWithType}",
+      "${path.path}$fileSeparator${path.nameWithType}",
     ).writeAsBytes(_exportFile(path));
 
     if (path.name == stopFolder) {
@@ -82,7 +83,7 @@ class BarrelGeneratorService {
 
   Uint8List _exportFolder(Path filePath) {
     return Uint8List.fromList([
-      ...'export \'${filePath.name}\\${filePath.nameWithType}\''.codeUnits,
+      ...'export \'${filePath.name}$fileSeparator${filePath.nameWithType}\''.codeUnits,
       ...newLine,
     ]);
   }

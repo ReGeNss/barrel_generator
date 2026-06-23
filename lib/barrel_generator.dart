@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:args/args.dart';
 import 'package:barrel_generator/application/service/barrel_generator_service.dart';
-import 'package:barrel_generator/application/service/fs_watcher.dart';
+import 'package:barrel_generator/application/service/system_watcher.dart';
 import 'package:barrel_generator/data/repository/generator_repository_impl.dart';
+import 'package:barrel_generator/data/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/data/source/path_to_ignore_source.dart';
 
 const String version = '0.0.1';
 
@@ -24,6 +27,7 @@ void printUsage(ArgParser argParser) {
 
 void main(List<String> arguments) async {
   final ArgParser argParser = buildParser();
+
   try {
     final ArgResults results = argParser.parse(arguments);
     bool verbose = false;
@@ -39,8 +43,17 @@ void main(List<String> arguments) async {
     }
 
     if (results.command?.name == 'watch') {
-      await FsWatcher(
-        generator: BarrelGeneratorService(repo: GeneratorRepositoryImpl()),
+      await SystemWatcher(
+        generator: BarrelGeneratorService(
+          repo: GeneratorRepositoryImpl(),
+          fileSeparator: Platform.isWindows ? '\\' : '/',
+        ),
+        ignoredPaths:
+            await PathToIgnoreRepositoryImpl(
+                workingDirectory: 'lib',
+                source: PathToIgnoreSource(),
+              )
+              ..getPathsToIgnore(),
       ).watch();
     }
   } on FormatException catch (e) {
