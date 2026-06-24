@@ -1,4 +1,4 @@
-import 'package:barrel_generator/data/source/path_to_ignore_source.dart';
+import 'package:barrel_generator/features/barrel_generator/data/source/path_to_ignore_source.dart';
 
 class PathToIgnoreSourceMock implements PathToIgnoreSource {
   @override

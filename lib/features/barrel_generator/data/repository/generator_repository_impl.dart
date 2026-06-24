@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:barrel_generator/domain/entity/fs_entity.dart';
-import 'package:barrel_generator/domain/repository/generator_repository.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/repository/generator_repository.dart';
 
 class GeneratorRepositoryImpl implements GeneratorRepository {
   @override

@@ -1,10 +1,10 @@
 import 'package:args/args.dart';
-import 'package:barrel_generator/application/service/barrel_generator_service.dart';
-import 'package:barrel_generator/application/service/watch_barrel_generator.dart';
-import 'package:barrel_generator/data/repository/system_watcher.dart';
-import 'package:barrel_generator/data/repository/generator_repository_impl.dart';
-import 'package:barrel_generator/data/repository/path_to_ignore_repository.dart';
-import 'package:barrel_generator/data/source/path_to_ignore_source.dart';
+import 'package:barrel_generator/features/barrel_generator/application/service/barrel_generator_service.dart';
+import 'package:barrel_generator/features/barrel_generator/application/service/watch_barrel_generator.dart';
+import 'package:barrel_generator/features/barrel_generator/data/repository/system_watcher.dart';
+import 'package:barrel_generator/features/barrel_generator/data/repository/generator_repository_impl.dart';
+import 'package:barrel_generator/features/barrel_generator/data/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/features/barrel_generator/data/source/path_to_ignore_source.dart';
 
 const String version = '0.0.1';
 

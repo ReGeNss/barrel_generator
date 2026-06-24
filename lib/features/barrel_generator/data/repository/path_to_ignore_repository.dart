@@ -1,5 +1,5 @@
-import 'package:barrel_generator/data/source/path_to_ignore_source.dart';
-import 'package:barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/features/barrel_generator/data/source/path_to_ignore_source.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
 
 class PathToIgnoreRepositoryImpl implements PathToIgnoreRepository {
   final String workingDirectory;

@@ -1,4 +1,4 @@
-import 'package:barrel_generator/data/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/features/barrel_generator/data/repository/path_to_ignore_repository.dart';
 import 'package:test/test.dart';
 
 import '../source/path_to_ignore_source.dart';

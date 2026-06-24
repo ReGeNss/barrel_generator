@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:barrel_generator/domain/entity/fs_entity.dart';
-import 'package:barrel_generator/domain/events/events.dart';
-import 'package:barrel_generator/domain/repository/fs_watcher.dart';
-import 'package:barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/events/events.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/repository/fs_watcher.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
 
 class SystemWatcher implements FsWatcher {
   final PathToIgnoreRepository ignoredPaths;
