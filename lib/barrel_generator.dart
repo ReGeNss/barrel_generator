@@ -73,7 +73,7 @@ void main(List<String> arguments) async {
           source: PathToIgnoreSource(),
         )..getPathsToIgnore(),
       ),
-    ).generateBarrelsFrom(Folder(Directory.current.path));
+    ).generateBarrelsFrom(Folder('lib'));
   } on FormatException catch (e) {
     // Print usage information if an invalid argument was provided.
     print(e.message);
