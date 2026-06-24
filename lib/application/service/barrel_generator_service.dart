@@ -68,6 +68,16 @@ class BarrelGeneratorService {
   Future<void> folderDeleted(Folder path) async =>
       await _removeFromBarrel(path, _requireParentFolder(path));
 
+  Future<void> folderRenamed(Folder from, Folder to) async {
+    final isRename = from.name != to.name;
+    final barrel = _createBarrelFilePath(to);
+
+    await folderDeleted(from);
+
+    if(isRename) await _repo.renameFile(barrel.rename(from.name) as FsFile, barrel);
+    await _generateBarrelFor(_createBarrelFilePath(_requireParentFolder(to)), to);
+  }
+
   Future<void> _removeFromBarrel(FsEntity path, Folder fileFolder) async {
     final rootBarrel = _createBarrelFilePath(fileFolder);
 

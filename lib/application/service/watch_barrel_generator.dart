@@ -17,8 +17,8 @@ class WatchBarrelGeneratorService {
           return await _g.createForFile(path as FsFile);
         case CreateFolderEvent():
           return await _g.createForFolder(path as Folder);
-        case RenamedFolderEvent():
-          break;
+        case RenamedFolderEvent(:final path, :final oldLocation):
+          return _g.folderRenamed(oldLocation, path);
         case RemovedFileEvent():
           return await _g.fileDeleted(path as FsFile);
         case RemovedFolderEvent():

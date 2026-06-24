@@ -46,4 +46,9 @@ class GeneratorRepositoryImpl implements GeneratorRepository {
         .map((e) => e is Directory ? Folder(e.path) : FsFile(e.path))
         .toSet();
   }
+  
+  @override
+  Future<void> renameFile(FsFile file, FsFile newFile) async {
+    await File(file.path).rename(newFile.path);
+  }
 }

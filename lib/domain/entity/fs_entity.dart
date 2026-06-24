@@ -28,6 +28,17 @@ abstract class FsEntity {
   ).firstMatch(path)!.group(1)!; // TODO:
 
   String get nameWithType => '$name.dart';
+
+  FsEntity rename(String newName) {
+    for (int i = path.length; i >= 0; i--) {
+      final cut = path.substring(i - name.length, i);
+
+      if (cut == name) {
+        return FsEntity.fromPath(path.replaceRange(i - name.length, i, newName));
+      }
+    }
+    throw ArgumentError('rename is failed');
+  }
 }
 
 class FsFile extends FsEntity {

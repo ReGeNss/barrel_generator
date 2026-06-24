@@ -16,4 +16,6 @@ abstract class GeneratorRepository {
   Future<void> create(FsFile path);
 
   Future<Set<FsEntity>> listFolderEntry(Folder path);
+
+  Future<void> renameFile(FsFile file, FsFile newFile);
 }
