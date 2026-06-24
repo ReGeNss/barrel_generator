@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:barrel_generator/domain/entity/path.dart';
+import 'package:barrel_generator/domain/entity/fs_entity.dart';
 import 'package:barrel_generator/domain/events/events.dart';
 import 'package:barrel_generator/domain/repository/fs_watcher.dart';
 import 'package:barrel_generator/domain/repository/path_to_ignore_repository.dart';
@@ -15,22 +15,40 @@ class SystemWatcher implements FsWatcher {
     return Directory.current
         .watch(recursive: true)
         .where((event) => !ignoredPaths.isIgnored(event.path))
-        .map((event) {
+        .expand((event) {
           print(event);
-          switch (event) {
-            case FileSystemCreateEvent(:final path, :final isDirectory):
-              if (isDirectory) {
-               return Event.createdFolder(path: FolderPath(path));
-              } else {
-                return Event.createdFile(path: FilePath(path));
-              }
-            case FileSystemModifyEvent(:final path, :final isDirectory):
-              return .renamedFile(path: FilePath(path), oldLocation: FilePath(path));
-            case FileSystemDeleteEvent(:final path):
-              return Event.removedFile(path: FilePath(path));
-            case FileSystemMoveEvent(:final path, :final isDirectory):
-              return .renamedFile(path: FilePath(path), oldLocation: FilePath(path));
-          }
+          final result = () {
+            switch (event) {
+              case FileSystemCreateEvent(:final path, :final isDirectory):
+                if (isDirectory) {
+                  return Event.createdFolder(path: Folder(path));
+                } else {
+                  return Event.createdFile(path: FsFile(path));
+                }
+              case FileSystemModifyEvent():
+                return null;
+              case FileSystemDeleteEvent(:final path):
+                final entity = FsEntity.fromPath(path);
+                if (entity is Folder) {
+                  return Event.removedFolder(path: entity);
+                }
+                return Event.removedFile(path: FsFile(path));
+              case FileSystemMoveEvent(
+                :final path,
+                :final destination,
+                :final isDirectory,
+              ):
+                if (destination == null || !isDirectory) return null;
+
+                if (isDirectory) {
+                  return Event.renamedFolder(
+                    path: Folder(destination),
+                    oldLocation: Folder(path),
+                  );
+                }
+            }
+          }();
+          return [?result];
         });
   }
 }

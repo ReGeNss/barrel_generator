@@ -1,17 +1,26 @@
-abstract class Path {
+abstract class FsEntity {
   final String path;
-  final FolderPath? parentFolder;
+  final Folder? parentFolder;
 
-  Path(this.path) : parentFolder = _findParentFolder(path);
+  FsEntity(this.path) : parentFolder = _findParentFolder(path);
 
-  static FolderPath? _findParentFolder(String path) {
+  static Folder? _findParentFolder(String path) {
     final folderPath = generateCrossPlatformRegExp(
       r'[\w\W]*[\/\\][\w\W]*(?![\w\.]*$)',
     ).stringMatch(path);
 
     return folderPath != null && folderPath.isNotEmpty
-        ? FolderPath(folderPath)
+        ? Folder(folderPath)
         : null;
+  }
+
+  static final reg = RegExp(r'[\/\\]\w+\.\w+');
+
+  factory FsEntity.fromPath(final String path) {
+    if (reg.hasMatch(path)) {
+      return FsFile(path);
+    }
+    return Folder(path);
   }
 
   String get name => generateCrossPlatformRegExp(
@@ -21,8 +30,8 @@ abstract class Path {
   String get nameWithType => '$name.dart';
 }
 
-class FilePath extends Path {
-  FilePath(super.path);
+class FsFile extends FsEntity {
+  FsFile(super.path);
 
   // FolderPath get fileFolder {
   //   final folderPath = generateCrossPlatformRegExp(r'[\w\W]*(?=(\\|\/)[\w\W]*\.)').stringMatch(path);
@@ -33,8 +42,8 @@ class FilePath extends Path {
   String? get folderName => parentFolder?.name;
 }
 
-class FolderPath extends Path {
-  FolderPath(super.path);
+class Folder extends FsEntity {
+  Folder(super.path);
 
   // FolderPath get rootFolder => FolderPath( generateCrossPlatformRegExp(r'[\w\W]*[\/\][\w\W]*(?![\w\.]*$)').stringMatch(path)!);
 }

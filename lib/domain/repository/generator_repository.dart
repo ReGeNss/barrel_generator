@@ -1,19 +1,19 @@
 import 'dart:typed_data';
 
-import 'package:barrel_generator/domain/entity/path.dart';
+import 'package:barrel_generator/domain/entity/fs_entity.dart';
 
 abstract class GeneratorRepository {
-  Future<bool> exists(Path path);
+  Future<bool> exists(FsEntity path);
 
-  Future<Uint8List> read(FilePath path);
+  Future<Uint8List> read(FsFile path);
 
-  Future<void> appendToFile(FilePath path, Uint8List data);
+  Future<void> appendToFile(FsFile path, Uint8List data);
 
-  Future<List<String>> readAsLines(FilePath path);
+  Future<List<String>> readAsLines(FsFile path);
 
-  Future<void> write(FilePath path, Uint8List data);
+  Future<void> write(FsFile path, Uint8List data);
 
-  Future<void> create(FilePath path);
+  Future<void> create(FsFile path);
 
-  Future<Set<Path>> listFolderEntry(FolderPath path);
+  Future<Set<FsEntity>> listFolderEntry(Folder path);
 }

@@ -1,26 +1,21 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../entity/path.dart';
+import '../entity/fs_entity.dart';
 
 part 'events.freezed.dart';
 
 @freezed
 sealed class Event with _$Event {
-  const factory Event.createdFile({required FilePath path}) = CreateFileEvent;
+  const factory Event.createdFile({required FsFile path}) = CreateFileEvent;
 
-  const factory Event.createdFolder({required FolderPath path}) = CreateFolderEvent;
+  const factory Event.createdFolder({required Folder path}) = CreateFolderEvent;
 
   const factory Event.renamedFolder({
-    required FolderPath path,
-    required FolderPath oldLocation,
+    required Folder path,
+    required Folder oldLocation,
   }) = RenamedFolderEvent;
 
-  const factory Event.renamedFile({
-    required FilePath path,
-    required FilePath oldLocation,
-  }) = RenamedFileEvent;
+  const factory Event.removedFile({required FsFile path}) = RemovedFileEvent;
 
-  const factory Event.removedFile({required FilePath path}) = RemovedFileEvent;
-
-  const factory Event.removedFolder({required FolderPath path}) = RemovedFolderEvent;
+  const factory Event.removedFolder({required Folder path}) = RemovedFolderEvent;
 }

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:barrel_generator/data/repository/generator_repository_impl.dart';
-import 'package:barrel_generator/domain/entity/path.dart';
+import 'package:barrel_generator/domain/entity/fs_entity.dart';
 import 'dart:collection';
 
 class BarrelGeneratorService {
@@ -17,7 +17,7 @@ class BarrelGeneratorService {
     required this._repo,
   });
 
-  Future<void> createForFile(FilePath path) async {
+  Future<void> createForFile(FsFile path) async {
     final folder = _requireParentFolder(path);
     final barrelFilePath = _createBarrelFilePath(folder);
 
@@ -28,13 +28,13 @@ class BarrelGeneratorService {
     await _generateBarrelFor(barrelFilePath, path);
   }
 
-  Future<void> createForFolder(FolderPath path) async {
+  Future<void> createForFolder(Folder path) async {
     if (!(await _repo.exists(path))) {
       throw ArgumentError('Folder did not exists');
     }
 
     await _repo.create(
-      FilePath("${path.path}$_fileSeparator${path.nameWithType}"),
+      FsFile("${path.path}$_fileSeparator${path.nameWithType}"),
     );
 
     if (path.name == _stopFolder) {
@@ -46,7 +46,7 @@ class BarrelGeneratorService {
     await _generateBarrelFor(rootBarrelFile, path);
   }
 
-  Future<void> _generateBarrelFor(FilePath barrelFile, Path file) async {
+  Future<void> _generateBarrelFor(FsFile barrelFile, FsEntity file) async {
     try {
       if (await _repo.exists(barrelFile)) {
         await _writeToBarrel(barrelFile, file);
@@ -62,13 +62,13 @@ class BarrelGeneratorService {
     }
   }
 
-  Future<void> fileDeleted(FilePath path) async =>
+  Future<void> fileDeleted(FsFile path) async =>
       await _removeFromBarrel(path, _requireParentFolder(path));
 
-  Future<void> folderDeleted(FolderPath path) async =>
+  Future<void> folderDeleted(Folder path) async =>
       await _removeFromBarrel(path, _requireParentFolder(path));
 
-  Future<void> _removeFromBarrel(Path path, FolderPath fileFolder) async {
+  Future<void> _removeFromBarrel(FsEntity path, Folder fileFolder) async {
     final rootBarrel = _createBarrelFilePath(fileFolder);
 
     final lines = await _repo.readAsLines(rootBarrel);
@@ -83,7 +83,7 @@ class BarrelGeneratorService {
     );
   }
 
-  Future<void> _writeToBarrel(FilePath barrelFilePath, Path path) async {
+  Future<void> _writeToBarrel(FsFile barrelFilePath, FsEntity path) async {
     var fileData = await _repo.read(barrelFilePath);
 
     bool hasEOF = false;
@@ -125,7 +125,7 @@ class BarrelGeneratorService {
     }
   }
 
-  Uint8List _getExportsFrom(Set<Path> dirFiles) {
+  Uint8List _getExportsFrom(Set<FsEntity> dirFiles) {
     final builder = BytesBuilder();
     for (final path in dirFiles) {
       builder.add(_exportPath(path));
@@ -133,27 +133,27 @@ class BarrelGeneratorService {
     return builder.toBytes();
   }
 
-  Future<Set<Path>> _getDirPaths(FolderPath folder, FilePath barrelPath) async {
+  Future<Set<FsEntity>> _getDirPaths(Folder folder, FsFile barrelPath) async {
     return (await _repo.listFolderEntry(
       folder,
     )).where((path) => path.path != barrelPath.path).toSet();
   }
 
-  Uint8List _exportPath(Path path) {
-    if (path is FilePath) {
+  Uint8List _exportPath(FsEntity path) {
+    if (path is FsFile) {
       return _exportFile(path);
     }
-    return _exportFolder(path as FolderPath);
+    return _exportFolder(path as Folder);
   }
 
-  Uint8List _exportFile(FilePath filePath) {
+  Uint8List _exportFile(FsFile filePath) {
     return Uint8List.fromList([
       ..."export '${filePath.nameWithType}';".codeUnits,
       _newLine,
     ]);
   }
 
-  Uint8List _exportFolder(FolderPath filePath) {
+  Uint8List _exportFolder(Folder filePath) {
     return Uint8List.fromList([
       ...'export \'${filePath.name}$_fileSeparator${filePath.nameWithType}\';'
           .codeUnits,
@@ -161,11 +161,11 @@ class BarrelGeneratorService {
     ]);
   }
 
-  FilePath _createBarrelFilePath(FolderPath folder) {
-    return FilePath(folder.path + r'\' + folder.nameWithType);
+  FsFile _createBarrelFilePath(Folder folder) {
+    return FsFile(folder.path + r'\' + folder.nameWithType);
   }
 
-  FolderPath _requireParentFolder(Path path) {
+  Folder _requireParentFolder(FsEntity path) {
     final folder = path.parentFolder;
     if (folder == null) {
       throw ArgumentError('Path "${path.path}" has no parent folder');
