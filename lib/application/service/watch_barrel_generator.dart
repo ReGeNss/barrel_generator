@@ -1,5 +1,4 @@
 import 'package:barrel_generator/application/service/barrel_generator_service.dart';
-import 'package:barrel_generator/domain/entity/fs_entity.dart';
 import 'package:barrel_generator/domain/events/events.dart';
 import 'package:barrel_generator/domain/repository/fs_watcher.dart';
 
@@ -11,20 +10,17 @@ class WatchBarrelGeneratorService {
 
   Future<void> watch() async {
     return _fsEvents.getEvents().listen((event) async {
-      final path = event.path;
       switch (event) {
-        case CreateFileEvent():
-          return await _g.createForFile(path as FsFile);
-        case CreateFolderEvent():
-          return await _g.createForFolder(path as Folder);
-        case RenamedFolderEvent(:final path, :final oldLocation):
-          return _g.folderRenamed(oldLocation, path);
-        case RemovedFileEvent():
-          return await _g.fileDeleted(path as FsFile);
-        case RemovedFolderEvent():
-          return await _g.folderDeleted(path as Folder);
-        case RenamedFileEvent():
-          break;
+        case CreateFileEvent(:final file):
+          return await _g.createForFile(file);
+        case CreateFolderEvent(:final folder):
+          return await _g.createForFolder(folder);
+        case RenamedFolderEvent(:final folder, :final oldFolder):
+          return _g.folderRenamed(folder, oldFolder);
+        case RemovedFileEvent(:final file):
+          return await _g.fileDeleted(file);
+        case RemovedFolderEvent(:final folder):
+          return await _g.folderDeleted(folder);
       }
     }).asFuture();
   }

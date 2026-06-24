@@ -4,8 +4,11 @@ import 'package:barrel_generator/data/repository/generator_repository_impl.dart'
 import 'package:barrel_generator/domain/entity/fs_entity.dart';
 import 'dart:collection';
 
+import 'package:barrel_generator/domain/repository/path_to_ignore_repository.dart';
+
 class BarrelGeneratorService {
   final GeneratorRepositoryImpl _repo;
+  final PathToIgnoreRepository _ignoreRepo;
   final String _stopFolder;
   final String _fileSeparator;
 
@@ -15,6 +18,7 @@ class BarrelGeneratorService {
     this._stopFolder = 'lib',
     this._fileSeparator = '/',
     required this._repo,
+    required this._ignoreRepo,
   });
 
   Future<void> createForFile(FsFile path) async {
@@ -146,7 +150,7 @@ class BarrelGeneratorService {
   Future<Set<FsEntity>> _getDirPaths(Folder folder, FsFile barrelPath) async {
     return (await _repo.listFolderEntry(
       folder,
-    )).where((path) => path.path != barrelPath.path).toSet();
+    )).where((path) => !_ignoreRepo.isIgnored(path.path) && path.path != barrelPath.path).toSet();
   }
 
   Uint8List _exportPath(FsEntity path) {
@@ -172,7 +176,7 @@ class BarrelGeneratorService {
   }
 
   FsFile _createBarrelFilePath(Folder folder) {
-    return FsFile(folder.path + r'\' + folder.nameWithType);
+    return FsFile(folder.path + _fileSeparator + folder.nameWithType);
   }
 
   Folder _requireParentFolder(FsEntity path) {

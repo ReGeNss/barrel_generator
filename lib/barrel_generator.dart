@@ -43,15 +43,18 @@ void main(List<String> arguments) async {
     }
 
     if (results.command?.name == 'watch') {
-      await WatchBarrelGeneratorService(
-        fsEvents: SystemWatcher(
-          ignoredPaths: PathToIgnoreRepositoryImpl(
+      final ignore = PathToIgnoreRepositoryImpl(
             workingDirectory: 'lib',
             source: PathToIgnoreSource(),
-          )..getPathsToIgnore(),
+          )..getPathsToIgnore();
+    
+      await WatchBarrelGeneratorService(
+        fsEvents: SystemWatcher(
+          ignoredPaths: ignore,
         ),
         g: BarrelGeneratorService(
-          repo: GeneratorRepositoryImpl(),
+          repo: GeneratorRepositoryImpl(), 
+          ignoreRepo: ignore,
         ),
       ).watch();
     }

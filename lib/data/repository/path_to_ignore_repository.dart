@@ -70,7 +70,7 @@ class PathToIgnoreRepositoryImpl implements PathToIgnoreRepository {
 
 extension RemoveWhere<T> on Set<T> {
   Iterable<T> removeWhereAndReturn(bool Function(T) test) {
-    final toRemove = where(test);
+    final toRemove = where(test).toList();
     removeWhere(test);
 
     return toRemove;

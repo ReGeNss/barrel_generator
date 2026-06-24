@@ -21,18 +21,18 @@ class SystemWatcher implements FsWatcher {
             switch (event) {
               case FileSystemCreateEvent(:final path, :final isDirectory):
                 if (isDirectory) {
-                  return Event.createdFolder(path: Folder(path));
+                  return Event.createdFolder(folder: Folder(path));
                 } else {
-                  return Event.createdFile(path: FsFile(path));
+                  return Event.createdFile(file: FsFile(path));
                 }
               case FileSystemModifyEvent():
                 return null;
               case FileSystemDeleteEvent(:final path):
                 final entity = FsEntity.fromPath(path);
                 if (entity is Folder) {
-                  return Event.removedFolder(path: entity);
+                  return Event.removedFolder(folder: entity);
                 }
-                return Event.removedFile(path: FsFile(path));
+                return Event.removedFile(file: FsFile(path));
               case FileSystemMoveEvent(
                 :final path,
                 :final destination,
@@ -42,8 +42,8 @@ class SystemWatcher implements FsWatcher {
 
                 if (isDirectory) {
                   return Event.renamedFolder(
-                    path: Folder(destination),
-                    oldLocation: Folder(path),
+                    folder: Folder(destination),
+                    oldFolder: Folder(path),
                   );
                 }
             }
