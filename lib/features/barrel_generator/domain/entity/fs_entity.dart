@@ -2,7 +2,7 @@ abstract class FsEntity {
   final String path;
   final Folder? parentFolder;
 
-  FsEntity(this.path) : parentFolder = _findParentFolder(path);
+  FsEntity(this.path, {Folder? parentFolder}) : parentFolder = parentFolder ?? _findParentFolder(path);
 
   static Folder? _findParentFolder(String path) {
     final folderPath = generateCrossPlatformRegExp(
@@ -42,7 +42,7 @@ abstract class FsEntity {
 }
 
 class FsFile extends FsEntity {
-  FsFile(super.path);
+  FsFile(super.path, {super.parentFolder});
 
   // FolderPath get fileFolder {
   //   final folderPath = generateCrossPlatformRegExp(r'[\w\W]*(?=(\\|\/)[\w\W]*\.)').stringMatch(path);
@@ -54,7 +54,7 @@ class FsFile extends FsEntity {
 }
 
 class Folder extends FsEntity {
-  Folder(super.path);
+  Folder(super.path, {super.parentFolder});
 
   // FolderPath get rootFolder => FolderPath( generateCrossPlatformRegExp(r'[\w\W]*[\/\][\w\W]*(?![\w\.]*$)').stringMatch(path)!);
 }
