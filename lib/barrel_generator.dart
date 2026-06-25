@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:args/args.dart';
 import 'package:barrel_generator/features/barrel_generator/application/service/barrel_generator_service.dart';
 import 'package:barrel_generator/features/barrel_generator/application/service/watch_barrel_generator.dart';

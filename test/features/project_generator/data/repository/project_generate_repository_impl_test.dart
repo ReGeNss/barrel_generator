@@ -2,7 +2,7 @@ import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_enti
 import 'package:barrel_generator/features/project_generator/data/repository/project_generate_repository_impl.dart';
 import 'package:test/test.dart';
 
-import '../source/project_generate_source.dart';
+import '../sources/project_generate_source.dart';
 
 void main() {
   group('Project generate repository tests', () {
