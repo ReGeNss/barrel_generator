@@ -1,18 +1,19 @@
 import 'package:barrel_generator/features/barrel_generator/data/source/path_to_ignore_source.dart';
 import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:injectable/injectable.dart';
 
+@Singleton(as: PathToIgnoreRepository)
 class PathToIgnoreRepositoryImpl implements PathToIgnoreRepository {
-  final String workingDirectory;
+  final String workingDirectory = 'lib'; // TODO: 
   final PathToIgnoreSource source;
 
-  PathToIgnoreRepositoryImpl({required this.workingDirectory, required this.source}) {
-    getPathsToIgnore();
-  }
+  PathToIgnoreRepositoryImpl({required this.source});
 
   final Set<String> _toIgnore = {};
   final Set<String> _absolutePathsToIgnore = {};
   final Set<String> _twoStar = {};
 
+  @PostConstruct()
   Future<void> getPathsToIgnore() async {
     final paths = await source.getGitIgnore();
 

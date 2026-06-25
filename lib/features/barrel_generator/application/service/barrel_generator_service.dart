@@ -1,25 +1,26 @@
+import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:barrel_generator/features/barrel_generator/data/repository/generator_repository_impl.dart';
 import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/repository/generator_repository.dart';
 import 'dart:collection';
 
 import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class BarrelGeneratorService {
-  final GeneratorRepositoryImpl _repo;
+  final GeneratorRepository _repo;
   final PathToIgnoreRepository _ignoreRepo;
-  final String _stopFolder;
+  final String _stopFolder = 'lib';
   final String _fileSeparator;
 
   static final _newLine = Uint8List.fromList('\n'.codeUnits).first;
 
   BarrelGeneratorService({
-    this._stopFolder = 'lib',
-    this._fileSeparator = '/',
     required this._repo,
     required this._ignoreRepo,
-  });
+  }) : _fileSeparator = Platform.isWindows ? '\\' : '/';
 
   Future<void> createForFile(FsFile path) async {
     final folder = path.parentFolder;
