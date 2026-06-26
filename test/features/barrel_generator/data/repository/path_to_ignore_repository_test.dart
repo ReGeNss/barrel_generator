@@ -23,7 +23,7 @@ void main() {
     test(
       "Ignore lib absolute path",
       () {
-        final path = 'lib/dart';
+        final path = PathToIgnoreSourceFixtures.libAbsolutePath;
 
         expect(repo.isIgnored(path), isTrue);
       },

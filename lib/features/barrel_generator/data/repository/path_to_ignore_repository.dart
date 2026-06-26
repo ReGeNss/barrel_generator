@@ -9,7 +9,7 @@ class PathToIgnoreRepositoryImpl implements PathToIgnoreRepository {
 
   PathToIgnoreRepositoryImpl({required this.source});
 
-  final Set<String> _toIgnore = {};
+  final Set<String> _oneStar = {};
   final Set<String> _absolutePathsToIgnore = {};
   final Set<String> _twoStar = {};
 
@@ -27,16 +27,18 @@ class PathToIgnoreRepositoryImpl implements PathToIgnoreRepository {
 
       final absolutePathRegExp = RegExp(r'\*');
 
-      final toIgnoreList = {...ignore}
+      final ignoreWithStars = {...ignore}
         ..removeWhere((text) => !absolutePathRegExp.hasMatch(text));
 
-      _absolutePathsToIgnore.addAll(toIgnoreList.toSet().difference(_toIgnore));
+      _absolutePathsToIgnore.addAll(ignore.toSet().difference(ignoreWithStars));
 
       _twoStar.addAll(
-        toIgnoreList
+        ignoreWithStars
             .removeWhereAndReturn((text) => text.startsWith('**'))
             .map((text) => text.replaceAll('**', '')),
       );
+
+      _oneStar.addAll(ignoreWithStars.difference(_twoStar));
     } catch (e) {
       print('can not get ignored files');
     }
@@ -57,7 +59,7 @@ class PathToIgnoreRepositoryImpl implements PathToIgnoreRepository {
       }
     }
 
-    for (final pattern in _toIgnore) {
+    for (final pattern in _oneStar) {
       final parts = pattern.split('*');
 
       if (parts.every((part) => path.contains(part))) {
