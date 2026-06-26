@@ -1,8 +1,7 @@
 import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
 import 'package:barrel_generator/features/project_generator/data/sources/project_generate_source.dart';
 import 'package:injectable_generator/utils.dart';
-
-import '../../application/service/project_generator_service_test.dart';
+import '../../domain/entity/fs_entity.dart';
 
 class ProjectGenerateSourceMock implements ProjectGenerateSource {
   final MFolder? root;
@@ -12,9 +11,7 @@ class ProjectGenerateSourceMock implements ProjectGenerateSource {
   @override
   Future<List<FsEntity>> listDirEntry(Folder folder) async {
     if (root == null) return [];
-    // return (await Directory(folder.path).list().toList())
-    //     .map((e) => e is Directory ?  Folder(e.path) : FsFile(e.path))
-    //     .toList();
+    
     final a = _get(folder) as MFolder;
 
     return a.entries.map((e) => e is MFolder ? Folder(e.path): FsFile(e.path)).toList();
@@ -42,4 +39,3 @@ class ProjectGenerateSourceMock implements ProjectGenerateSource {
     return curFolder;
   }
 }
-

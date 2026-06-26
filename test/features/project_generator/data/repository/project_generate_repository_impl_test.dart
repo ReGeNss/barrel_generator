@@ -22,8 +22,11 @@ void main() {
       () async {
         final repo = ProjectGenerateRepositoryImpl(
           sources: ProjectGenerateSourceMock({
-            'root': ['root/a', 'root/b'],
-            'root/a': ['root/a/a1', 'root/a/a2'],
+            'a' : {
+              "a1": {},
+              "a2": {},
+            },
+            'b' : {}
           }),
         );
 
@@ -43,8 +46,9 @@ void main() {
       "Returns Folder instances for every entry",
       () async {
         final repo = ProjectGenerateRepositoryImpl(
-          sources: ProjectGenerateSourceMock({'root': ['root/a']}),
-        );
+          sources: ProjectGenerateSourceMock(
+            {'a': {}}
+        ));
 
         final result = await repo.getFlatTree(Folder('root'));
 
@@ -57,7 +61,8 @@ void main() {
       () async {
         final root = Folder('root');
         final repo = ProjectGenerateRepositoryImpl(
-          sources: ProjectGenerateSourceMock({'root': ['root/a']}),
+          sources: ProjectGenerateSourceMock(
+            {'a': ''})
         );
 
         final result = await repo.getFlatTree(root);
