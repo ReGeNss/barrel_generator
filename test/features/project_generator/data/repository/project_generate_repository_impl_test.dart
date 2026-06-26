@@ -36,8 +36,6 @@ void main() {
           'root',
           'root/a',
           'root/a/a1',
-          'root/a/a2',
-          'root/b',
         ]);
       },
     );

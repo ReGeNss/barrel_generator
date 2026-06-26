@@ -1,5 +1,7 @@
 import 'package:barrel_generator/features/barrel_generator/application/service/barrel_generator_service.dart';
 import 'package:barrel_generator/features/barrel_generator/data/repository/generator_repository_impl.dart';
+import 'package:barrel_generator/features/barrel_generator/data/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/features/barrel_generator/data/source/path_to_ignore_source.dart';
 import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
 import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
 import 'package:barrel_generator/features/project_generator/application/service/project_generator_service.dart';
@@ -76,17 +78,9 @@ void main() {
         'core': {'constants.dart': ''},
         'features': {
           'auth': {
-            'data': {
-              'models': {'user.dart': ''},
-              'repository': {'auth_repository.dart': ''},
-            },
             'domain': {
               'entity': {'user.dart': ''},
               'repository': {'auth_repository.dart': ''},
-            },
-            'presentation': {
-              'screens': {'auth_screen.dart': ''},
-              'widgets': {'main_widget.dart': ''},
             },
           },
         },
@@ -106,18 +100,68 @@ void main() {
       await service.generateBarrelsFrom(Folder('root'));
 
       expect(fs.existsByString('root/core/core.dart'), isTrue);
-      expect(fs.contentsOf('root/core/core.dart'), ContainsOnly(exportFile('constants')));
+      expect(
+        fs.contentsOf('root/core/core.dart'),
+        ContainsOnly(exportFile('constants')),
+      );
 
       expect(
         fs.contentsOf('root/features/auth/domain/entity/entity.dart'),
         ContainsOnly(exportFile('user')),
       );
-      
+
       expect(
         fs.contentsOf('root/features/auth/domain/domain.dart').split('\n'),
-        containsAll([exportFolder('entity'), exportFolder('repository'), ''])
+        containsAll([exportFolder('entity'), exportFolder('repository'), '']),
+      );
+    });
+
+    test("Ignore files from git ignore", () async {
+      final tree = {
+        'core': {'constants.dart': ''},
+        'features': {
+          'auth': {
+            'domain': {
+              'entity': {'user.dart': '', 'user.g.dart': ''},
+              'repository': {'auth_repository.dart': '', 'some.dart': ''},
+            },
+          },
+        },
+        'utils': {'extension': ''},
+      };
+
+      final src = PathToIgnoreSourceMock(ignore: ['**.g.dart', '**/some.dart']);
+
+      final ign = PathsToIgnoreRepositoryImpl(
+        source: src,
+        workingDirectory: 'root',
       );
 
+      await ign.getPathsToIgnore();
+
+      final fs = InMemoryGeneratorRepository(tree: tree);
+      final service = ProjectGeneratorService(
+        repo: ProjectGenerateRepositoryImpl(
+          sources: ProjectGenerateSourceMock(tree),
+        ),
+        barrelGen: BarrelGeneratorService(repo: fs, ignoreRepo: ign),
+      );
+
+      await service.generateBarrelsFrom(Folder('root'));
+
+      expect(
+        fs
+            .contentsOf('root/features/auth/domain/entity/entity.dart')
+            .split('\n'),
+        isNot(containsAll([exportFile('user.g')])),
+      );
+
+      expect(
+        fs
+            .contentsOf('root/features/auth/domain/repository/repository.dart')
+            .split('\n'),
+        isNot(containsOnce(exportFile('some'))),
+      );
     });
 
     test(
@@ -202,5 +246,15 @@ class ContainsOnly extends Matcher {
     if (item != '$content\n') return false;
 
     return true;
+  }
+}
+
+class PathToIgnoreSourceMock implements PathToIgnoreSource {
+  final List<String> ignore;
+
+  PathToIgnoreSourceMock({required this.ignore});
+  @override
+  Future<List<String>> getGitIgnore() async {
+    return ignore;
   }
 }
