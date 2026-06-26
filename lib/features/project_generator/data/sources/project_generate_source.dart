@@ -5,10 +5,9 @@ import 'package:injectable/injectable.dart';
 
 @singleton
 class ProjectGenerateSource {
-  Future<List<Folder>> listDirsInDir(Folder folder) async {
+  Future<List<FsEntity>> listDirEntry(Folder folder) async {
     return (await Directory(folder.path).list().toList())
-        .whereType<Directory>()
-        .map((dir) => Folder(dir.path))
+        .map((e) => e is Directory ?  Folder(e.path) : FsFile(e.path))
         .toList();
   }
 }

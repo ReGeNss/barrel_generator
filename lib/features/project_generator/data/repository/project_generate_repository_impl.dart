@@ -10,19 +10,20 @@ class ProjectGenerateRepositoryImpl implements ProjectGenerateRepository {
   ProjectGenerateRepositoryImpl({required this.sources});
 
   @override
-  Future<List<Folder>> getFlatTree(Folder folder) async {
+  Future<List<FsEntity>> getFlatTree(Folder folder) async {
     return await get(folder);
   }
 
-  Future<List<Folder>> get(Folder folder) async {
-    final result = <Folder>[folder];
-    final dirEntry = await sources.listDirsInDir(folder);
-    
-    if (dirEntry.isEmpty) {
-      return [...result];
+  Future<List<FsEntity>> get(Folder folder) async {
+    final result = <FsEntity>[folder];
+    final dirEntry = await sources.listDirEntry(folder);
+    final dirFolders = dirEntry.whereType<Folder>();
+
+    if (dirFolders.isEmpty) {
+      return [...result, ...dirEntry.whereType<FsFile>()];
     }
 
-    for (final entry in dirEntry) {
+    for (final entry in dirFolders) {
       result.addAll(await get(entry));
     }
     return [...result];

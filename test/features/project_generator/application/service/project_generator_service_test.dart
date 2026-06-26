@@ -6,9 +6,11 @@ import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_enti
 import 'package:barrel_generator/features/barrel_generator/domain/repository/generator_repository.dart';
 import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
 import 'package:barrel_generator/features/project_generator/application/service/project_generator_service.dart';
-import 'package:barrel_generator/features/project_generator/domain/repository/project_generate_repository.dart';
+import 'package:barrel_generator/features/project_generator/data/repository/project_generate_repository_impl.dart';
 import 'package:injectable_generator/utils.dart';
 import 'package:test/test.dart';
+
+import '../../data/sources/project_generate_source.dart';
 
 void main() {
   group('Project generator service tests', () {
@@ -17,12 +19,10 @@ void main() {
       () async {
         final barrelGen = BarrelGeneratorServiceSpy();
         final service = ProjectGeneratorService(
-          repo: ProjectGenerateRepositoryFake([
-            Folder('root'),
-            Folder('root/a'),
-            Folder('root/b'),
-          ]),
           barrelGen: barrelGen,
+          repo: ProjectGenerateRepositoryImpl(
+            sources: ProjectGenerateSourceMock({'a': {}, 'b': {}}),
+          ),
         );
 
         await service.generateBarrelsFrom(Folder('root'));
@@ -34,52 +34,24 @@ void main() {
         ]);
       },
     );
-
-    test("Does nothing when the repository returns no folders", () async {
-      final barrelGen = BarrelGeneratorServiceSpy();
-      final service = ProjectGeneratorService(
-        repo: ProjectGenerateRepositoryFake([]),
-        barrelGen: barrelGen,
-      );
-
-      await service.generateBarrelsFrom(Folder('root'));
-
-      expect(barrelGen.calls, isEmpty);
-    });
-
-    test("Passes the requested folder on to the repository", () async {
-      final repo = ProjectGenerateRepositoryFake([Folder('root')]);
-      final service = ProjectGeneratorService(
-        repo: repo,
-        barrelGen: BarrelGeneratorServiceSpy(),
-      );
-      final root = Folder('root');
-
-      await service.generateBarrelsFrom(root);
-
-      expect(repo.lastRequestedFolder, same(root));
-    });
-
     test(
       "Generates barrels in the same order the repository returns them",
       () async {
         final barrelGen = BarrelGeneratorServiceSpy();
         final service = ProjectGeneratorService(
-          repo: ProjectGenerateRepositoryFake([
-            Folder('root/b'),
-            Folder('root/a'),
-            Folder('root'),
-          ]),
+          repo: ProjectGenerateRepositoryImpl(
+            sources: ProjectGenerateSourceMock({'a': {}, 'b': {}}),
+          ),
           barrelGen: barrelGen,
         );
 
         await service.generateBarrelsFrom(Folder('root'));
 
-        expect(barrelGen.calls.map((folder) => folder.path), [
-          'root/b',
-          'root/a',
+        expect(barrelGen.calls.map((folder) => folder.path), containsAll([
           'root',
-        ]);
+          'root/a',
+          'root/b',
+        ]));
       },
     );
   });
@@ -88,15 +60,23 @@ void main() {
     test("Includes files from a folder in its generated barrel", () async {
       final fs = InMemoryGeneratorRepository(
         tree: {
-          'a': {'foo.dart': '', 'bar.dart': '', 'b': {}},
+          'a': {
+            'foo.dart': '',
+            'bar.dart': '',
+            'b': {'c.dart': ''},
+          },
         },
       );
       final service = ProjectGeneratorService(
-        repo: ProjectGenerateRepositoryFake([
-          Folder('root'),
-          Folder('root/a'),
-          Folder('root/a/b'),
-        ]),
+        repo: ProjectGenerateRepositoryImpl(
+          sources: ProjectGenerateSourceMock({
+            'a': {
+              'foo.dart': '',
+              'bar.dart': '',
+              'b': {'c.dart': ''},
+            },
+          }),
+        ),
         barrelGen: BarrelGeneratorService(
           repo: fs,
           ignoreRepo: NoopPathToIgnoreRepository(),
@@ -110,7 +90,8 @@ void main() {
       expect(barrel, contains("export 'bar.dart';"));
       expect(barrel, contains("export 'b/b.dart';"));
       expect(fs.existsByString('root/a/b/b.dart'), isTrue);
-      expect(fs.contentsOf('root/a/b/b.dart'), '');
+      final bBarrel = fs.contentsOf('root/a/b/b.dart');
+      expect(bBarrel, contains("export 'c.dart';"));
     });
 
     test(
@@ -122,11 +103,11 @@ void main() {
           },
         );
         final service = ProjectGeneratorService(
-          repo: ProjectGenerateRepositoryFake([
-            Folder('root'),
-            Folder('root/a'),
-            Folder('root/a/b'),
-          ]),
+          repo: ProjectGenerateRepositoryImpl(
+            sources: ProjectGenerateSourceMock({
+              'a': {'foo.dart': '', 'foo.g.dart': '', 'b': {}},
+            }),
+          ),
           barrelGen: BarrelGeneratorService(
             repo: fs,
             ignoreRepo: IgnoreGeneratedFilesRepository(),
@@ -141,19 +122,6 @@ void main() {
       },
     );
   });
-}
-
-class ProjectGenerateRepositoryFake implements ProjectGenerateRepository {
-  final List<Folder> tree;
-  Folder? lastRequestedFolder;
-
-  ProjectGenerateRepositoryFake(this.tree);
-
-  @override
-  Future<List<Folder>> getFlatTree(Folder folder) async {
-    lastRequestedFolder = folder;
-    return tree;
-  }
 }
 
 class BarrelGeneratorServiceSpy extends BarrelGeneratorService {

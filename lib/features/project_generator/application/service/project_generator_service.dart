@@ -11,10 +11,13 @@ class ProjectGeneratorService {
   ProjectGeneratorService({required this._repo, required this._barrelGen});
 
   Future<void> generateBarrelsFrom(Folder folder) async {
-    final folders = await _repo.getFlatTree(folder);
+    final flatTree = await _repo.getFlatTree(folder);
 
-    for (final folder in folders) {
+    for (final folder in flatTree.whereType<Folder>()) {
       await _barrelGen.createForFolder(folder);
+    }
+    for (final file in flatTree.whereType<FsFile>()) {
+      await _barrelGen.createForFile(file);
     }
   }
 }
