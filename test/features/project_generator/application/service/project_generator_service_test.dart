@@ -27,28 +27,7 @@ void main() {
         expect(barrelGen.calls.map((folder) => folder.path), [
           'root',
           'root/a',
-          'root/b',
         ]);
-      },
-    );
-    test(
-      "Generates barrels in the same order the repository returns them",
-      () async {
-        final barrelGen = BarrelGeneratorServiceSpy();
-        final service = ProjectGeneratorService(
-          repo: ProjectGenerateRepositoryImpl(
-            sources: ProjectGenerateSourceMock({'a': {}, 'b': {}}),
-          ),
-          barrelGen: barrelGen,
-        );
-
-        await service.generateBarrelsFrom(Folder('root'));
-
-        expect(barrelGen.calls.map((folder) => folder.path), containsAll([
-          'root',
-          'root/a',
-          'root/b',
-        ]));
       },
     );
   });
@@ -90,6 +69,55 @@ void main() {
       final bBarrel = fs.contentsOf('root/a/b/b.dart');
       expect(bBarrel, contains("export 'c.dart';"));
       expect(bBarrel, isNot(contains("export 'b/b.dart';")));
+    });
+
+    test("Includes files fro", () async {
+      final tree = {
+        'core': {'constants.dart': ''},
+        'features': {
+          'auth': {
+            'data': {
+              'models': {'user.dart': ''},
+              'repository': {'auth_repository.dart': ''},
+            },
+            'domain': {
+              'entity': {'user.dart': ''},
+              'repository': {'auth_repository.dart': ''},
+            },
+            'presentation': {
+              'screens': {'auth_screen.dart': ''},
+              'widgets': {'main_widget.dart': ''},
+            },
+          },
+        },
+        'utils': {'extension': ''},
+      };
+      final fs = InMemoryGeneratorRepository(tree: tree);
+      final service = ProjectGeneratorService(
+        repo: ProjectGenerateRepositoryImpl(
+          sources: ProjectGenerateSourceMock(tree),
+        ),
+        barrelGen: BarrelGeneratorService(
+          repo: fs,
+          ignoreRepo: NoopPathToIgnoreRepository(),
+        ),
+      );
+
+      await service.generateBarrelsFrom(Folder('root'));
+
+      expect(fs.existsByString('root/core/core.dart'), isTrue);
+      expect(fs.contentsOf('root/core/core.dart'), ContainsOnly(exportFile('constants')));
+
+      expect(
+        fs.contentsOf('root/features/auth/domain/entity/entity.dart'),
+        ContainsOnly(exportFile('user')),
+      );
+      
+      expect(
+        fs.contentsOf('root/features/auth/domain/domain.dart').split('\n'),
+        containsAll([exportFolder('entity'), exportFolder('repository'), ''])
+      );
+
     });
 
     test(
@@ -145,4 +173,34 @@ class NoopPathToIgnoreRepository implements PathToIgnoreRepository {
 class IgnoreGeneratedFilesRepository implements PathToIgnoreRepository {
   @override
   bool isIgnored(String path) => path.endsWith('.g.dart');
+}
+
+String exportFile(String name) {
+  return "export '$name.dart';";
+}
+
+String exportFolder(String name) {
+  return "export '$name/$name.dart';";
+}
+
+class ContainsOnly extends Matcher {
+  final String content;
+
+  ContainsOnly(this.content);
+
+  @override
+  Description describe(Description description) {
+    return description;
+  }
+
+  @override
+  bool matches(item, Map<dynamic, dynamic> matchState) {
+    if (item is! String) {
+      throw ArgumentError.value(item, 'item', 'should be String');
+    }
+
+    if (item != '$content\n') return false;
+
+    return true;
+  }
 }

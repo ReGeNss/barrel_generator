@@ -39,6 +39,11 @@ abstract class FsEntity {
     }
     throw ArgumentError('rename is failed');
   }
+
+  @override
+  String toString() {
+    return '$runtimeType: $name\n';
+  }
 }
 
 class FsFile extends FsEntity {

@@ -76,7 +76,7 @@ class InMemoryGeneratorRepository extends GeneratorRepository {
     }
     return String.fromCharCodes(
       content,
-    ).split('\n').where((line) => line.isNotEmpty).toList();
+    ).split('\n').toList();
   }
 
   @override
