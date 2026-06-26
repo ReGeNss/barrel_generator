@@ -1,13 +1,14 @@
+import 'package:barrel_generator/core/constants.dart';
 import 'package:barrel_generator/features/barrel_generator/data/source/path_to_ignore_source.dart';
 import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
 import 'package:injectable/injectable.dart';
 
-@Singleton(as: PathToIgnoreRepository)
-class PathToIgnoreRepositoryImpl implements PathToIgnoreRepository {
-  final String workingDirectory = 'lib'; // TODO: 
+@singleton
+class PathsToIgnoreRepositoryImpl implements PathToIgnoreRepository {
+  final String workingDirectory;
   final PathToIgnoreSource source;
 
-  PathToIgnoreRepositoryImpl({required this.source});
+  PathsToIgnoreRepositoryImpl({required this.source, @Named(worDirName) required this.workingDirectory});
 
   final Set<String> _oneStar = {};
   final Set<String> _absolutePathsToIgnore = {};

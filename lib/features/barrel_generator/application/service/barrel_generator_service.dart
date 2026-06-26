@@ -11,7 +11,6 @@ import 'package:injectable/injectable.dart';
 class BarrelGeneratorService {
   final GeneratorRepository _repo;
   final PathToIgnoreRepository _ignoreRepo;
-  final String _stopFolder = 'lib';
   final String _fileSeparator = '/';
 
   static final _newLine = Uint8List.fromList('\n'.codeUnits).first;
@@ -38,6 +37,10 @@ class BarrelGeneratorService {
   }
 
   Future<void> createForFolder(Folder path) async {
+    if (_ignoreRepo.isIgnored(path.path)) {
+      return;
+    }
+
     if (!(await _repo.exists(path))) {
       throw ArgumentError('Folder did not exists');
     }
@@ -46,9 +49,6 @@ class BarrelGeneratorService {
       FsFile("${path.path}$_fileSeparator${path.nameWithType}"),
     );
 
-    if (path.name == _stopFolder) {
-      return;
-    }
 
     final parentFolder = path.parentFolder;
 

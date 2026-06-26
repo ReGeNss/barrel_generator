@@ -24,7 +24,7 @@ void printUsage(ArgParser argParser) {
 }
 
 void main(List<String> arguments) async {
-  await configureDependencies();
+  await configureDependencies('lib');
   final ArgParser argParser = buildParser();
 
   try {

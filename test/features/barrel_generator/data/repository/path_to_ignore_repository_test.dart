@@ -5,9 +5,9 @@ import '../source/path_to_ignore_source.dart';
 
 void main() {
   group('Path to ignore repository tests', () {
-    final repo = PathToIgnoreRepositoryImpl(source: PathToIgnoreSourceMock());
+    final repo = PathsToIgnoreRepositoryImpl(source: PathToIgnoreSourceMock(), workingDirectory: 'lib');
 
-    setUp(() async {
+    setUpAll(() async {
       await repo.getPathsToIgnore();
     });
 

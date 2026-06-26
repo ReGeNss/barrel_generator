@@ -6,7 +6,7 @@ abstract class FsEntity {
 
   static Folder? _findParentFolder(String path) {
     final folderPath = generateCrossPlatformRegExp(
-      r'[\w\W]*[\/\\][\w\W]*(?![\w\.]*$)',
+      r'[\w\W]*[\/\\]*[\w\W]*(?![\w\.]*$)',
     ).stringMatch(path);
 
     return folderPath != null && folderPath.isNotEmpty
