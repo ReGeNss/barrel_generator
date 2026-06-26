@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
@@ -13,14 +12,14 @@ class BarrelGeneratorService {
   final GeneratorRepository _repo;
   final PathToIgnoreRepository _ignoreRepo;
   final String _stopFolder = 'lib';
-  final String _fileSeparator;
+  final String _fileSeparator = '/';
 
   static final _newLine = Uint8List.fromList('\n'.codeUnits).first;
 
   BarrelGeneratorService({
     required this._repo,
     required this._ignoreRepo,
-  }) : _fileSeparator = Platform.isWindows ? '\\' : '/';
+  });
 
   Future<void> createForFile(FsFile path) async {
     final folder = path.parentFolder;

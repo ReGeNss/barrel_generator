@@ -29,7 +29,6 @@ void main(List<String> arguments) async {
 
   try {
     final ArgResults results = argParser.parse(arguments);
-    bool verbose = false;
 
     // Process the parsed arguments.
     if (results.flag('help')) {
@@ -46,7 +45,7 @@ void main(List<String> arguments) async {
       return;
     }
 
-    await sl<ProjectGeneratorService>().generateBarrelsFrom(Folder('lib'));
+    await (await sl.getAsync<ProjectGeneratorService>()).generateBarrelsFrom(Folder('lib'));
 
   } on FormatException catch (e) {
     // Print usage information if an invalid argument was provided.
