@@ -1,12 +1,9 @@
 import 'dart:typed_data';
-
-import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/repository/generator_repository.dart';
 import 'dart:collection';
-
-import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
-import 'package:barrel_generator/utils/extension/uint_list.dart';
+import 'package:barrel_generator/utils/utils.dart';
 import 'package:injectable/injectable.dart';
+import 'package:barrel_generator/features/features.dart';
+
 
 @injectable
 class BarrelGeneratorService {

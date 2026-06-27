@@ -1,9 +1,6 @@
-import 'package:barrel_generator/config/di/injectable.dart';
-import 'package:barrel_generator/features/barrel_generator/data/repository/non_barrel_path_repository.dart';
-import 'package:barrel_generator/features/barrel_generator/data/repository/path_to_ignore_repository.dart';
-import 'package:barrel_generator/features/barrel_generator/data/source/path_to_ignore_source.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/config/config.dart';
 import 'package:injectable/injectable.dart';
+import 'package:barrel_generator/features/features.dart';
 
 @Singleton(as: PathToIgnoreRepository)
 class PathToIgnoreComposite implements PathToIgnoreRepository {

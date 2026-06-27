@@ -1,6 +1,5 @@
-import 'package:barrel_generator/core/constants.dart';
-import 'package:barrel_generator/features/barrel_generator/data/source/path_to_ignore_source.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/core/core.dart';
+import 'package:barrel_generator/features/features.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton

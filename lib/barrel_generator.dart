@@ -1,7 +1,6 @@
 import 'package:args/command_runner.dart';
-import 'package:barrel_generator/config/di/injectable.dart';
-import 'package:barrel_generator/features/barrel_generator/application/service/watch_barrel_generator.dart';
-import 'package:barrel_generator/features/project_generator/application/service/project_generator_service.dart';
+import 'package:barrel_generator/config/config.dart';
+import 'package:barrel_generator/features/features.dart';
 
 const String version = '0.0.1';
 
@@ -14,7 +13,7 @@ void main(List<String> arguments) async {
   
   try {
     final results = runner.parse(arguments);
-    final workDir = results.rest.firstOrNull ?? 'lib';
+    final workDir = results.command?.rest.firstOrNull ?? 'lib';
     await configureDependencies(workDir);
 
     if (results.flag('version')) {

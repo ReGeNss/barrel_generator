@@ -1,9 +1,5 @@
 import 'dart:io';
-
-import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/events/fs_event.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/repository/fs_watcher.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/features/features.dart';
 import 'package:injectable/injectable.dart';
 
 @Singleton(as: FsWatcher)

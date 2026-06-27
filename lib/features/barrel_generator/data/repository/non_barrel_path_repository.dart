@@ -1,7 +1,6 @@
-import 'package:barrel_generator/core/constants.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/core/core.dart';
 import 'package:injectable/injectable.dart';
+import 'package:barrel_generator/features/features.dart';
 
 @singleton
 class NonBarrelPathRepository implements PathToIgnoreRepository {

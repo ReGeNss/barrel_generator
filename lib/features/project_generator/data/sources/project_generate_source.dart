@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
+import 'package:barrel_generator/features/features.dart';
 import 'package:injectable/injectable.dart';
 
 @singleton

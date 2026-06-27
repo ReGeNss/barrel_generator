@@ -1,8 +1,6 @@
-import 'package:barrel_generator/core/constants.dart';
+import 'package:barrel_generator/core/core.dart';
+import 'package:barrel_generator/features/features.dart';
 import 'package:injectable/injectable.dart';
-import 'package:barrel_generator/features/barrel_generator/application/service/barrel_generator_service.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/entity/fs_entity.dart';
-import 'package:barrel_generator/features/project_generator/domain/repository/project_generate_repository.dart';
 
 @injectable
 class ProjectGeneratorService {
