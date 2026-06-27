@@ -1,5 +1,5 @@
 import 'package:barrel_generator/features/barrel_generator/application/service/barrel_generator_service.dart';
-import 'package:barrel_generator/features/barrel_generator/domain/events/events.dart';
+import 'package:barrel_generator/features/barrel_generator/domain/events/fs_event.dart';
 import 'package:barrel_generator/features/barrel_generator/domain/repository/fs_watcher.dart';
 import 'package:injectable/injectable.dart';
 

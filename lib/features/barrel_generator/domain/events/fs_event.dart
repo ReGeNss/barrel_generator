@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../entity/fs_entity.dart';
 
-part 'events.freezed.dart';
+part 'fs_event.freezed.dart';
 
 @freezed
 sealed class Event with _$Event {
