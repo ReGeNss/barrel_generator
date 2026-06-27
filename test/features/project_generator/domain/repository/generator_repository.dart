@@ -63,8 +63,16 @@ class InMemoryGeneratorRepository extends GeneratorRepository {
 
   @override
   Future<void> write(FsFile path, Uint8List data) async {
-    final e = _get(path) as MFile;
-    e.content = String.fromCharCodes(data);
+    final folder = _get(path.parentFolder!) as MFolder;
+    
+    final file = folder.entries.firstWhereOrNull((e) => e.route == path.nameWithType) as MFile?;
+
+    if (file != null) {
+      file.content = String.fromCharCodes(data);
+    } else {
+      folder.entries.add(MFile(path.nameWithType, path.path, content: String.fromCharCodes(data)));
+    }
+    
   }
 
   @override

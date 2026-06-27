@@ -156,10 +156,6 @@ class BarrelGeneratorService {
         .where((byte) => byte == _newLine)
         .length;
 
-    if (hasEOF) {
-      countOfFilesInBarrel--;
-    }
-
     final dirFiles = await _getDirPaths(
       barrelFilePath.parentFolder!,
       barrelFilePath,
