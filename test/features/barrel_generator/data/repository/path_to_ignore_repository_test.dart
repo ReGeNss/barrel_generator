@@ -50,7 +50,16 @@ void main() {
     test(
       "Ignore two non lib stars",
       () {
-        final path = 'android/app/**.dart';
+        final path = PathToIgnoreSourceFixtures.twoNonLibStars;
+
+        expect(repo.isIgnored(path), isTrue);
+      },
+    );
+
+    test(
+      "Ignore path with Windows path format",
+      () {
+        final path = PathToIgnoreSourceFixtures.twoStarsWindows;
 
         expect(repo.isIgnored(path), isTrue);
       },

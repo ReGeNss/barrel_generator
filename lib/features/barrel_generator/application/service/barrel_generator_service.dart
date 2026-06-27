@@ -97,8 +97,9 @@ class BarrelGeneratorService {
 
     await folderDeleted(from);
 
-    if (isRename)
+    if (isRename) {
       await _repo.renameFile(barrel.rename(from.name) as FsFile, barrel);
+    }
 
     final parentFolder = to.parentFolder;
 

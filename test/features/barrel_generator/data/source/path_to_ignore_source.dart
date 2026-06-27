@@ -14,6 +14,7 @@ List<String> pathToIgnoreFixture() {
       PathToIgnoreSourceFixtures.commentedPath,
       PathToIgnoreSourceFixtures.twoStarsPath,
       PathToIgnoreSourceFixtures.oneStarPath,
+      PathToIgnoreSourceFixtures.twoStarsLinux,
     ];
 }
 
@@ -23,4 +24,7 @@ class PathToIgnoreSourceFixtures {
  static const commentedPath = '#lib/main2.dart';
  static const twoStarsPath  = '**.g.dart';
  static const oneStarPath = 'repository/*/sources';
+ static const twoNonLibStars = 'android/app/**.dart';
+ static const twoStarsLinux = r'**/injectable.config.dart';
+ static const twoStarsWindows = r'lib\config\injectable.config.dart';
 }

@@ -8,7 +8,10 @@ class PathsToIgnoreRepositoryImpl implements PathToIgnoreRepository {
   final String workingDirectory;
   final PathToIgnoreSource source;
 
-  PathsToIgnoreRepositoryImpl({required this.source, @Named(worDirName) required this.workingDirectory});
+  PathsToIgnoreRepositoryImpl({
+    required this.source,
+    @Named(worDirName) required this.workingDirectory,
+  });
 
   final Set<String> _oneStar = {};
   final Set<String> _absolutePathsToIgnore = {};
@@ -47,15 +50,15 @@ class PathsToIgnoreRepositoryImpl implements PathToIgnoreRepository {
 
   @override
   bool isIgnored(String path) {
-    if (!(path.contains('$workingDirectory/') ||
-        path.contains('$workingDirectory\\') )) {
+    final pathNorm = path.replaceAll(r'\', '/');
+    if (!pathNorm.contains('$workingDirectory/')) {
       return true;
     }
 
-    if (_absolutePathsToIgnore.contains(path)) return true;
+    if (_absolutePathsToIgnore.contains(pathNorm)) return true;
 
     for (final pattern in _twoStar) {
-      if (path.contains(pattern)) {
+      if (pathNorm.contains(pattern)) {
         return true;
       }
     }
@@ -63,7 +66,7 @@ class PathsToIgnoreRepositoryImpl implements PathToIgnoreRepository {
     for (final pattern in _oneStar) {
       final parts = pattern.split('*');
 
-      if (parts.every((part) => path.contains(part))) {
+      if (parts.every((part) => pathNorm.contains(part))) {
         return true;
       }
     }

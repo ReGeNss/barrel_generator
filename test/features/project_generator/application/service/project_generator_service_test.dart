@@ -118,6 +118,12 @@ void main() {
 
     test("Ignore files from git ignore", () async {
       final tree = {
+        'config': {
+          'di' : {
+            'injectable.dart' : "",
+            'injectable.config.dart' : "",
+          }
+        },
         'core': {'constants.dart': ''},
         'features': {
           'auth': {
@@ -130,7 +136,7 @@ void main() {
         'utils': {'extension': ''},
       };
 
-      final src = PathToIgnoreSourceMock(ignore: ['**.g.dart', '**/some.dart']);
+      final src = PathToIgnoreSourceMock(ignore: ['**.g.dart', '**/some.dart', '**/injectable.config.dart']);
 
       final ign = PathsToIgnoreRepositoryImpl(
         source: src,
@@ -154,6 +160,13 @@ void main() {
             .contentsOf('root/features/auth/domain/entity/entity.dart')
             .split('\n'),
         isNot(containsAll([exportFile('user.g')])),
+      );
+
+      expect(
+        fs
+            .contentsOf('root/config/di/di.dart')
+            .split('\n'),
+        isNot(containsAll([exportFile('injectable.config')])),
       );
 
       expect(
