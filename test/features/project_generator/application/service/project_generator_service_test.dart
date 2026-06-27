@@ -102,16 +102,16 @@ void main() {
       expect(fs.existsByString('root/core/core.dart'), isTrue);
       expect(
         fs.contentsOf('root/core/core.dart'),
-        ContainsOnly(exportFile('constants')),
+        ContainsOnly([exportFile('constants')]),
       );
 
       expect(
         fs.contentsOf('root/features/auth/domain/entity/entity.dart'),
-        ContainsOnly(exportFile('user')),
+        ContainsOnly([exportFile('user')]),
       );
 
       expect(
-        fs.contentsOf('root/features/auth/domain/domain.dart').split('\n'),
+        fs.contentsOf('root/features/auth/domain/domain.dart'),
         containsAll([exportFolder('entity'), exportFolder('repository'), '']),
       );
     });
@@ -119,10 +119,7 @@ void main() {
     test("Ignore files from git ignore", () async {
       final tree = {
         'config': {
-          'di' : {
-            'injectable.dart' : "",
-            'injectable.config.dart' : "",
-          }
+          'di': {'injectable.dart': "", 'injectable.config.dart': ""},
         },
         'core': {'constants.dart': ''},
         'features': {
@@ -136,7 +133,9 @@ void main() {
         'utils': {'extension': ''},
       };
 
-      final src = PathToIgnoreSourceMock(ignore: ['**.g.dart', '**/some.dart', '**/injectable.config.dart']);
+      final src = PathToIgnoreSourceMock(
+        ignore: ['**.g.dart', '**/some.dart', '**/injectable.config.dart'],
+      );
 
       final ign = PathsToIgnoreRepositoryImpl(
         source: src,
@@ -156,23 +155,17 @@ void main() {
       await service.generateBarrelsFrom(Folder('root'));
 
       expect(
-        fs
-            .contentsOf('root/features/auth/domain/entity/entity.dart')
-            .split('\n'),
+        fs.contentsOf('root/features/auth/domain/entity/entity.dart'),
         isNot(containsAll([exportFile('user.g')])),
       );
 
       expect(
-        fs
-            .contentsOf('root/config/di/di.dart')
-            .split('\n'),
+        fs.contentsOf('root/config/di/di.dart'),
         isNot(containsAll([exportFile('injectable.config')])),
       );
 
       expect(
-        fs
-            .contentsOf('root/features/auth/domain/repository/repository.dart')
-            .split('\n'),
+        fs.contentsOf('root/features/auth/domain/repository/repository.dart'),
         isNot(containsOnce(exportFile('some'))),
       );
     });
@@ -204,6 +197,142 @@ void main() {
         expect(barrel, isNot(contains("export 'foo.g.dart';")));
       },
     );
+
+    test("Project generation is idempotent", () async {
+      var tree = {
+        'a': {'foo.dart': '', 'foo.g.dart': ''},
+      };
+      final fs = InMemoryGeneratorRepository(tree: tree);
+      final service = ProjectGeneratorService(
+        repo: ProjectGenerateRepositoryImpl(
+          sources: ProjectGenerateSourceMock(tree),
+        ),
+        barrelGen: BarrelGeneratorService(
+          repo: fs,
+          ignoreRepo: IgnoreGeneratedFilesRepository(),
+        ),
+      );
+
+      await service.generateBarrelsFrom(Folder('root'));
+
+      final barrel1 = fs.contentsOf('root/a/a.dart');
+      expect(barrel1, containsOnce("export 'foo.dart';"));
+      expect(barrel1, isNot(contains("export 'foo.g.dart';")));
+
+      print(barrel1);
+      await service.generateBarrelsFrom(Folder('root'));
+
+      final barrel2 = fs.contentsOf('root/a/a.dart');
+
+      print(barrel2);
+      expect(barrel2, containsOnce("export 'foo.dart';"));
+      expect(barrel2, isNot(contains("export 'foo.g.dart';")));
+    });
+
+    test("Idempotent if baller already exists and writes EOF", () async {
+      var tree = {
+        'a': {'foo.dart': '', 'foo.g.dart': '', 'a.dart': exportFile('foo')},
+      };
+      final fs = InMemoryGeneratorRepository(tree: tree);
+      final service = ProjectGeneratorService(
+        repo: ProjectGenerateRepositoryImpl(
+          sources: ProjectGenerateSourceMock(tree),
+        ),
+        barrelGen: BarrelGeneratorService(
+          repo: fs,
+          ignoreRepo: IgnoreGeneratedFilesRepository(),
+        ),
+      );
+
+      await service.generateBarrelsFrom(Folder('root'));
+
+      final barrel1 = fs.contentsOf('root/a/a.dart');
+      expect(barrel1, containsAllInOrder([exportFile('foo'), '']));
+      expect(barrel1, isNot(contains("export 'foo.g.dart';")));
+    });
+
+    test(
+      "Idempotent if baller already exists and not writes EOF if it exists",
+      () async {
+        var tree = {
+          'a': {
+            'foo.dart': '',
+            'foo.g.dart': '',
+            'a.dart': '${exportFile('foo')}\n',
+          },
+        };
+        final fs = InMemoryGeneratorRepository(tree: tree);
+        final service = ProjectGeneratorService(
+          repo: ProjectGenerateRepositoryImpl(
+            sources: ProjectGenerateSourceMock(tree),
+          ),
+          barrelGen: BarrelGeneratorService(
+            repo: fs,
+            ignoreRepo: IgnoreGeneratedFilesRepository(),
+          ),
+        );
+
+        await service.generateBarrelsFrom(Folder('root'));
+
+        final barrel1 = fs.contentsOf('root/a/a.dart');
+        expect(barrel1, containsAllInOrder([exportFile('foo'), '']));
+        expect(barrel1, isNot(contains("export 'foo.g.dart';")));
+      },
+    );
+
+    test(
+      "Idempotent if baller already exists and not writes EOF if it exists",
+      () async {
+        var tree = {
+          'a': {
+            'foo.dart': '',
+            'foo.g.dart': '',
+            'a.dart': '${exportFile('foo')}\n',
+          },
+        };
+        final fs = InMemoryGeneratorRepository(tree: tree);
+        final service = ProjectGeneratorService(
+          repo: ProjectGenerateRepositoryImpl(
+            sources: ProjectGenerateSourceMock(tree),
+          ),
+          barrelGen: BarrelGeneratorService(
+            repo: fs,
+            ignoreRepo: IgnoreGeneratedFilesRepository(),
+          ),
+        );
+
+        await service.generateBarrelsFrom(Folder('root'));
+
+        final barrel1 = fs.contentsOf('root/a/a.dart');
+        expect(barrel1, containsAllInOrder([exportFile('foo'), '']));
+        expect(barrel1, isNot(contains("export 'foo.g.dart';")));
+      },
+    );
+
+    test("throws error when barrel contains something else", () async {
+      var tree = {
+        'a': {
+          'foo.dart': '',
+          'foo.g.dart': '',
+          'a.dart': '${exportFile('foo2')}\n ${exportFile('file')}\n fasdfas\n',
+        },
+      };
+      final fs = InMemoryGeneratorRepository(tree: tree);
+      final service = ProjectGeneratorService(
+        repo: ProjectGenerateRepositoryImpl(
+          sources: ProjectGenerateSourceMock(tree),
+        ),
+        barrelGen: BarrelGeneratorService(
+          repo: fs,
+          ignoreRepo: IgnoreGeneratedFilesRepository(),
+        ),
+      );
+
+      await expectLater(
+        () async => await service.generateBarrelsFrom(Folder('root')),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
   });
 }
 
@@ -241,24 +370,26 @@ String exportFolder(String name) {
 }
 
 class ContainsOnly extends Matcher {
-  final String content;
+  final List<String> content;
 
-  ContainsOnly(this.content);
+  ContainsOnly(this.content) {
+    content.add('');
+  }
 
   @override
   Description describe(Description description) {
-    return description;
+    return description..add(content.toString());
   }
 
   @override
   bool matches(item, Map<dynamic, dynamic> matchState) {
-    if (item is! String) {
-      throw ArgumentError.value(item, 'item', 'should be String');
+    if (item is! List<String>) {
+      throw ArgumentError.value(item, 'item', 'should be List<String>');
     }
 
-    if (item != '$content\n') return false;
+    if (item.indexed.every((pair) => content[pair.$1] == pair.$2)) return true;
 
-    return true;
+    return false;
   }
 }
 

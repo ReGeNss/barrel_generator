@@ -8,13 +8,17 @@ import '../entity/fs_entity.dart';
 
 class InMemoryGeneratorRepository extends GeneratorRepository {
   final MFolder root;
-  final Map<String, Uint8List> _files = {};
 
   InMemoryGeneratorRepository({required Map<String, dynamic> tree})
     : root = MFolder.generate(tree);
 
-  String contentsOf(String path) =>
-      String.fromCharCodes(_files[path] ?? Uint8List(0));
+  List<String> contentsOf(String path) {
+    final file = (_get(FsEntity.fromPath(path)) as MFile?);
+
+    print('$path: ${file?.content}');
+
+    return (file?.content ?? '').split('\n');
+  } 
 
   @override
   Future<bool> exists(FsEntity path) async {
@@ -22,7 +26,7 @@ class InMemoryGeneratorRepository extends GeneratorRepository {
   }
 
   bool existsByString(String path) {
-    return _files.containsKey(path);
+    return _get(FsEntity.fromPath(path)) != null;
   }
 
   MFsEntity? _get(FsEntity path) {
@@ -49,34 +53,35 @@ class InMemoryGeneratorRepository extends GeneratorRepository {
 
   @override
   Future<void> create(FsFile path) async {
-    _files.putIfAbsent(path.path, () => Uint8List(0));
+    final f = _get(path.parentFolder!) as MFolder;
+  
+    f.entries.add(MFile(path.nameWithType, path.path));
   }
 
   @override
   Future<Uint8List> read(FsFile path) async {
-    return _files[path.path] ?? Uint8List(0);
+    return Uint8List.fromList((_get(path) as MFile).content.codeUnits);
   }
 
   @override
   Future<void> write(FsFile path, Uint8List data) async {
-    _files[path.path] = data;
+    final e = _get(path) as MFile;
+    e.content = String.fromCharCodes(data);
   }
 
   @override
   Future<void> appendToFile(FsFile path, Uint8List data) async {
-    final existing = _files[path.path] ?? Uint8List(0);
-    _files[path.path] = Uint8List.fromList([...existing, ...data]);
+    final existing = _get(path) as MFile;
+    existing.content += String.fromCharCodes(data);
   }
 
   @override
   Future<List<String>> readAsLines(FsFile path) async {
-    final content = _files[path.path];
-    if (content == null) {
+    final file = _get(path) as MFile?;
+    if (file == null) {
       return [];
     }
-    return String.fromCharCodes(
-      content,
-    ).split('\n').toList();
+    return file.content.split('\n').toList();
   }
 
   @override
@@ -88,9 +93,12 @@ class InMemoryGeneratorRepository extends GeneratorRepository {
 
   @override
   Future<void> renameFile(FsFile file, FsFile newFile) async {
-    final content = _files.remove(file.path);
-    if (content != null) {
-      _files[newFile.path] = content;
-    }
+    final folder = _get(file.parentFolder!) as MFolder;
+    
+    final e = folder.entries.firstWhere((test) => test.path == file.path) as MFile;
+
+    folder.entries.remove(e);
+
+    folder.entries.add(MFile(newFile.nameWithType, newFile.path, content: e.content));
   }
 }

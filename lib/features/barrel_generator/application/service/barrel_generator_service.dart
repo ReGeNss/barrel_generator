@@ -5,6 +5,7 @@ import 'package:barrel_generator/features/barrel_generator/domain/repository/gen
 import 'dart:collection';
 
 import 'package:barrel_generator/features/barrel_generator/domain/repository/path_to_ignore_repository.dart';
+import 'package:barrel_generator/utils/extension/uint_list.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
@@ -73,7 +74,8 @@ class BarrelGeneratorService {
         await _repo.write(barrelFile, bytes);
       }
     } catch (e) {
-      print(e.toString());
+      rethrow;
+      // print(e.toString());
     }
   }
 
@@ -141,6 +143,15 @@ class BarrelGeneratorService {
       }
     }
 
+    final newExport = Uint8List.fromList(_exportPath(path));
+
+    if (fileData.containsSublist(newExport)) {
+      if (!hasEOF) {
+        _repo.appendToFile(barrelFilePath, Uint8List.fromList([_newLine]));
+      } 
+      return;
+    }
+
     int countOfFilesInBarrel = fileData
         .where((byte) => byte == _newLine)
         .length;
@@ -155,10 +166,11 @@ class BarrelGeneratorService {
     );
 
     if (dirFiles.length > countOfFilesInBarrel) {
-      return _repo.write(barrelFilePath, _getExportsFrom(dirFiles));
+      return await _repo.write(barrelFilePath, _getExportsFrom(dirFiles));
+    } else if (dirFiles.length + 1 < countOfFilesInBarrel) {
+      throw ArgumentError('something else located is barrel');
     }
 
-    final newExport = Uint8List.fromList(_exportPath(path));
 
     try {
       await _repo.appendToFile(barrelFilePath, newExport);

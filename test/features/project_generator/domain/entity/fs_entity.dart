@@ -6,7 +6,7 @@ abstract class MFsEntity {
 }
 
 class MFile extends MFsEntity {
-  final String content;
+  String content;
 
   MFile(super.route, super.path, {this.content = ''});
 
