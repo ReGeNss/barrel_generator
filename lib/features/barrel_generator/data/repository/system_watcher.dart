@@ -18,7 +18,6 @@ class SystemWatcher implements FsWatcher {
         .watch(recursive: true)
         .where((event) => !ignoredPaths.isIgnored(event.path))
         .expand((event) {
-          print(event);
           final result = () {
             switch (event) {
               case FileSystemCreateEvent(:final path, :final isDirectory):

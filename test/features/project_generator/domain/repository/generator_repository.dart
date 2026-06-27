@@ -14,9 +14,7 @@ class InMemoryGeneratorRepository extends GeneratorRepository {
 
   List<String> contentsOf(String path) {
     final file = (_get(FsEntity.fromPath(path)) as MFile?);
-
-    print('$path: ${file?.content}');
-
+    
     return (file?.content ?? '').split('\n');
   } 
 

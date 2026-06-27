@@ -219,12 +219,10 @@ void main() {
       expect(barrel1, containsOnce("export 'foo.dart';"));
       expect(barrel1, isNot(contains("export 'foo.g.dart';")));
 
-      print(barrel1);
       await service.generateBarrelsFrom(Folder('root'));
 
       final barrel2 = fs.contentsOf('root/a/a.dart');
 
-      print(barrel2);
       expect(barrel2, containsOnce("export 'foo.dart';"));
       expect(barrel2, isNot(contains("export 'foo.g.dart';")));
     });
@@ -247,6 +245,30 @@ void main() {
       await service.generateBarrelsFrom(Folder('root'));
 
       final barrel1 = fs.contentsOf('root/a/a.dart');
+      expect(barrel1, containsAllInOrder([exportFile('foo'), '']));
+      expect(barrel1, isNot(contains("export 'foo.g.dart';")));
+    });
+
+    test("don't add EOF if already exists", () async {
+      var tree = {
+        'a': {'foo.dart': '', 'foo.g.dart': '', 'a.dart': exportFile('foo')},
+      };
+      final fs = InMemoryGeneratorRepository(tree: tree);
+      final service = ProjectGeneratorService(
+        repo: ProjectGenerateRepositoryImpl(
+          sources: ProjectGenerateSourceMock(tree),
+        ),
+        barrelGen: BarrelGeneratorService(
+          repo: fs,
+          ignoreRepo: IgnoreGeneratedFilesRepository(),
+        ),
+      );
+
+      await service.generateBarrelsFrom(Folder('root'));
+      await service.generateBarrelsFrom(Folder('root'));
+
+      final barrel1 = fs.contentsOf('root/a/a.dart');
+      expect(barrel1.length, 2);
       expect(barrel1, containsAllInOrder([exportFile('foo'), '']));
       expect(barrel1, isNot(contains("export 'foo.g.dart';")));
     });

@@ -131,7 +131,7 @@ class BarrelGeneratorService {
     var fileData = await _repo.read(barrelFilePath);
 
     bool hasEOF = false;
-    final skipToEOF = fileData.length - 2;
+    final skipToEOF = fileData.length - 1;
     if (skipToEOF > 0) {
       hasEOF = fileData
           .skip(skipToEOF)
