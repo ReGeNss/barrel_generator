@@ -18,13 +18,14 @@ void main() {
       () async {
         final barrelGen = BarrelGeneratorServiceSpy();
         final service = ProjectGeneratorService(
+          workDir: 'root',
           barrelGen: barrelGen,
           repo: ProjectGenerateRepositoryImpl(
             sources: ProjectGenerateSourceMock({'a': {}, 'b': {}}),
           ),
         );
 
-        await service.generateBarrelsFrom(Folder('root'));
+        await service.generateBarrels();
 
         expect(barrelGen.calls.map((folder) => folder.path), [
           'root',
@@ -46,6 +47,7 @@ void main() {
         },
       );
       final service = ProjectGeneratorService(
+        workDir: 'root',
         repo: ProjectGenerateRepositoryImpl(
           sources: ProjectGenerateSourceMock({
             'a': {
@@ -61,7 +63,7 @@ void main() {
         ),
       );
 
-      await service.generateBarrelsFrom(Folder('root'));
+      await service.generateBarrels();
 
       final barrel = fs.contentsOf('root/a/a.dart');
       expect(barrel, contains("export 'foo.dart';"));
@@ -88,6 +90,7 @@ void main() {
       };
       final fs = InMemoryGeneratorRepository(tree: tree);
       final service = ProjectGeneratorService(
+        workDir: 'root',
         repo: ProjectGenerateRepositoryImpl(
           sources: ProjectGenerateSourceMock(tree),
         ),
@@ -97,7 +100,7 @@ void main() {
         ),
       );
 
-      await service.generateBarrelsFrom(Folder('root'));
+      await service.generateBarrels();
 
       expect(fs.existsByString('root/core/core.dart'), isTrue);
       expect(
@@ -146,13 +149,14 @@ void main() {
 
       final fs = InMemoryGeneratorRepository(tree: tree);
       final service = ProjectGeneratorService(
+        workDir: 'root',
         repo: ProjectGenerateRepositoryImpl(
           sources: ProjectGenerateSourceMock(tree),
         ),
         barrelGen: BarrelGeneratorService(repo: fs, ignoreRepo: ign),
       );
 
-      await service.generateBarrelsFrom(Folder('root'));
+      await service.generateBarrels();
 
       expect(
         fs.contentsOf('root/features/auth/domain/entity/entity.dart'),
@@ -179,6 +183,7 @@ void main() {
           },
         );
         final service = ProjectGeneratorService(
+          workDir: 'root',
           repo: ProjectGenerateRepositoryImpl(
             sources: ProjectGenerateSourceMock({
               'a': {'foo.dart': '', 'foo.g.dart': '', 'b': {}},
@@ -190,7 +195,7 @@ void main() {
           ),
         );
 
-        await service.generateBarrelsFrom(Folder('root'));
+        await service.generateBarrels();
 
         final barrel = fs.contentsOf('root/a/a.dart');
         expect(barrel, contains("export 'foo.dart';"));
@@ -204,6 +209,7 @@ void main() {
       };
       final fs = InMemoryGeneratorRepository(tree: tree);
       final service = ProjectGeneratorService(
+        workDir: 'root',
         repo: ProjectGenerateRepositoryImpl(
           sources: ProjectGenerateSourceMock(tree),
         ),
@@ -213,13 +219,13 @@ void main() {
         ),
       );
 
-      await service.generateBarrelsFrom(Folder('root'));
+      await service.generateBarrels();
 
       final barrel1 = fs.contentsOf('root/a/a.dart');
       expect(barrel1, containsOnce("export 'foo.dart';"));
       expect(barrel1, isNot(contains("export 'foo.g.dart';")));
 
-      await service.generateBarrelsFrom(Folder('root'));
+      await service.generateBarrels();
 
       final barrel2 = fs.contentsOf('root/a/a.dart');
 
@@ -233,6 +239,7 @@ void main() {
       };
       final fs = InMemoryGeneratorRepository(tree: tree);
       final service = ProjectGeneratorService(
+        workDir: 'root',
         repo: ProjectGenerateRepositoryImpl(
           sources: ProjectGenerateSourceMock(tree),
         ),
@@ -242,7 +249,7 @@ void main() {
         ),
       );
 
-      await service.generateBarrelsFrom(Folder('root'));
+      await service.generateBarrels();
 
       final barrel1 = fs.contentsOf('root/a/a.dart');
       expect(barrel1, containsAllInOrder([exportFile('foo'), '']));
@@ -255,6 +262,7 @@ void main() {
       };
       final fs = InMemoryGeneratorRepository(tree: tree);
       final service = ProjectGeneratorService(
+        workDir: 'root',
         repo: ProjectGenerateRepositoryImpl(
           sources: ProjectGenerateSourceMock(tree),
         ),
@@ -264,8 +272,8 @@ void main() {
         ),
       );
 
-      await service.generateBarrelsFrom(Folder('root'));
-      await service.generateBarrelsFrom(Folder('root'));
+      await service.generateBarrels();
+      await service.generateBarrels();
 
       final barrel1 = fs.contentsOf('root/a/a.dart');
       expect(barrel1.length, 2);
@@ -285,6 +293,7 @@ void main() {
         };
         final fs = InMemoryGeneratorRepository(tree: tree);
         final service = ProjectGeneratorService(
+          workDir: 'root',
           repo: ProjectGenerateRepositoryImpl(
             sources: ProjectGenerateSourceMock(tree),
           ),
@@ -294,7 +303,7 @@ void main() {
           ),
         );
 
-        await service.generateBarrelsFrom(Folder('root'));
+        await service.generateBarrels();
 
         final barrel1 = fs.contentsOf('root/a/a.dart');
         expect(barrel1, containsAllInOrder([exportFile('foo'), '']));
@@ -314,6 +323,7 @@ void main() {
         };
         final fs = InMemoryGeneratorRepository(tree: tree);
         final service = ProjectGeneratorService(
+          workDir: 'root',
           repo: ProjectGenerateRepositoryImpl(
             sources: ProjectGenerateSourceMock(tree),
           ),
@@ -323,7 +333,7 @@ void main() {
           ),
         );
 
-        await service.generateBarrelsFrom(Folder('root'));
+        await service.generateBarrels();
 
         final barrel1 = fs.contentsOf('root/a/a.dart');
         expect(barrel1, containsAllInOrder([exportFile('foo'), '']));
@@ -341,6 +351,7 @@ void main() {
       };
       final fs = InMemoryGeneratorRepository(tree: tree);
       final service = ProjectGeneratorService(
+        workDir: 'root',
         repo: ProjectGenerateRepositoryImpl(
           sources: ProjectGenerateSourceMock(tree),
         ),
@@ -351,7 +362,7 @@ void main() {
       );
 
       await expectLater(
-        () async => await service.generateBarrelsFrom(Folder('root')),
+        () async => await service.generateBarrels(),
         throwsA(isA<ArgumentError>()),
       );
     });

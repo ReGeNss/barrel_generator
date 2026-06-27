@@ -7,7 +7,7 @@ import 'package:injectable/injectable.dart';
 class NonBarrelPathRepository implements PathToIgnoreRepository {
   final ignoreFolder = <String>{};
 
-  NonBarrelPathRepository(@Named(worDirName) String workDir) {
+  NonBarrelPathRepository(@Named(wokDirName) String workDir) {
     ignoreFolder.add(workDir);
   }
 

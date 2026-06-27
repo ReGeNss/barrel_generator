@@ -10,7 +10,7 @@ class PathsToIgnoreRepositoryImpl implements PathToIgnoreRepository {
 
   PathsToIgnoreRepositoryImpl({
     required this.source,
-    @Named(worDirName) required this.workingDirectory,
+    @Named(wokDirName) required this.workingDirectory,
   });
 
   final Set<String> _oneStar = {};

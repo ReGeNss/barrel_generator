@@ -1,1 +1,1 @@
-const worDirName = 'worDir';
+const wokDirName = 'wokDir';

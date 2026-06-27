@@ -8,7 +8,7 @@ final sl = GetIt.instance;
 
 @InjectableInit()  
 Future<void> configureDependencies(String workDir) async {
-  sl.registerSingleton(workDir, instanceName: worDirName);
+  sl.registerSingleton(workDir, instanceName: wokDirName);
 
   await sl.init().allReady();
 }
