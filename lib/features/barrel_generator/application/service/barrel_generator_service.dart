@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:collection';
 import 'package:barrel_generator/utils/utils.dart';
@@ -9,7 +10,7 @@ import 'package:barrel_generator/features/features.dart';
 class BarrelGeneratorService {
   final GeneratorRepository _repo;
   final PathToIgnoreRepository _ignoreRepo;
-  final String _fileSeparator = '/';
+  final String _fileSeparator = Platform.isWindows ? r'\' : '/';
 
   static final _newLine = Uint8List.fromList('\n'.codeUnits).first;
 
@@ -112,6 +113,8 @@ class BarrelGeneratorService {
   Future<void> _removeFromBarrel(FsEntity path, Folder fileFolder) async {
     final rootBarrel = _createBarrelFilePath(fileFolder);
 
+    if (rootBarrel.path == path.path) return;
+
     final lines = await _repo.readAsLines(rootBarrel);
 
     final formattedBarrel = lines.where(
@@ -205,7 +208,7 @@ class BarrelGeneratorService {
 
   Uint8List _exportFolder(Folder filePath) {
     return Uint8List.fromList([
-      ...'export \'${filePath.name}$_fileSeparator${filePath.nameWithType}\';'
+      ...'export \'${filePath.name}/${filePath.nameWithType}\';'
           .codeUnits,
       _newLine,
     ]);

@@ -8,7 +8,7 @@
             "name": "barrel_generator",
             "request": "launch",
             "type": "dart",
-            // "args": ["watch"]
+            "args": ["watch"]
         }
     ]
 }
