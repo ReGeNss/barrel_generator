@@ -5,14 +5,19 @@ import 'package:injectable/injectable.dart';
 @singleton
 class PathToIgnoreSource {
   Future<List<String>> getGitIgnore() async {
-    final process = await Process.run(Platform.isWindows ? 'type' : 'cat', [
+    final gitignore = await Process.run(Platform.isWindows ? 'type' : 'cat', [
       '.gitignore',
     ], runInShell: true);
 
-    try {
-      final result = process.stdout as String;
+    final barrelIgnore = await Process.run(Platform.isWindows ? 'type' : 'cat', [
+      '.barrel_ignore',
+    ], runInShell: true);
 
-      return result.split('\n');
+    try {
+      final gitIgnoreLines = gitignore.stdout as String;
+      final barrelIgnoreLines = barrelIgnore.stdout as String;
+
+      return [...gitIgnoreLines.split('\n'), ...barrelIgnoreLines.split('\n')] ;
     } catch (e) {
       return [];
     }
